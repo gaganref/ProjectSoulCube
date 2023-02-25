@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
 
+class ACubeController;
 class AFollowCameraActor;
 class UArrowComponent;
 
@@ -30,8 +31,11 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
+
+#if WITH_EDITORONLY_DATA
 	UPROPERTY(Category = Debug, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bDebug;
+#endif
 	
 public:
 	/** Name of the PawnMesh component. */
@@ -77,6 +81,10 @@ private:
 	/** Reference to the spawned player follow camera. */
 	UPROPERTY(Category = FollowCamera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", DisplayPriority = -3))
 	TObjectPtr<AFollowCameraActor> FollowCamera;
+
+	/** Store a reference for Cube Player Controller at begin play for future use */
+	UPROPERTY(Category = Controller, VisibleDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<ACubeController> PlayerControllerRef;
 	
 public:
 	/** Returns Follow Camera */

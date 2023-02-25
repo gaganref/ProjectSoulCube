@@ -3,8 +3,11 @@
 
 #include "Player/PlayerPawn.h"
 
+#include "DebugFunctionLibrary.h"
+#include "..\..\..\..\Plugins\DebugLibrary\Source\DebugLibrary\Public\DebugLibraryCommon.h"
 #include "Components/ArrowComponent.h"
 #include "Camera/FollowCameraActor.h"
+#include "Controller/CubeController.h"
 
 FName APlayerPawn::PawnMeshName(TEXT("PawnMesh"));
 FVector APlayerPawn::SpawnCameraOffset(FVector(-120.0f, 0.0f, 15.0f));
@@ -46,6 +49,8 @@ void APlayerPawn::BeginPlay()
 	
 	Super::BeginPlay();
 
+	PlayerControllerRef = Cast<ACubeController>(GetController());
+	
 	if(!FollowCameraClass)
 	{
 		FollowCameraClass = AFollowCameraActor::StaticClass();
@@ -54,17 +59,24 @@ void APlayerPawn::BeginPlay()
 	CameraSpawnParameters.Instigator = this;
 	CameraSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	FTransform SpawnTransform = GetTransform();
-	SpawnTransform.AddToTranslation(SpawnCameraOffset);
-	// SpawnTransform.SetLocation(SpawnTransform.GetLocation() + SpawnCameraOffset);
+	const FVector RotatedSpawnOffset = SpawnTransform.GetRotation().RotateVector(SpawnCameraOffset);
+	SpawnTransform.SetLocation(SpawnTransform.GetLocation() + RotatedSpawnOffset);
 	FollowCamera = World->SpawnActor<AFollowCameraActor>(FollowCameraClass->GetDefaultObject()->GetClass(), SpawnTransform, CameraSpawnParameters);
 	check(FollowCamera);
 
-	const TObjectPtr<APlayerController> PlayerController = Cast<APlayerController>(GetController());
-	if(PlayerController)
+	if(PlayerControllerRef)
 	{
-		PlayerController->SetViewTarget(FollowCamera);
+		PlayerControllerRef->SetViewTarget(FollowCamera);
 	}
-	
+	else
+	{
+#if WITH_EDITORONLY_DATA
+		if(bDebug)
+		{
+			DEBUG_PRINT_CUSTOM_TEXT_WITH_INFO(TEXT("PlayerControllerRef is not valid."));
+		}
+#endif
+	}
 }
 
 // Called every frame
@@ -78,6 +90,6 @@ void APlayerPawn::Tick(float DeltaTime)
 void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	
 }
 

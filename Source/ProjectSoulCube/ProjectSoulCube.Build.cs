@@ -8,7 +8,7 @@ public class ProjectSoulCube : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "DebugLibrary" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
