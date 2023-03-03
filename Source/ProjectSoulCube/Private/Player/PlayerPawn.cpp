@@ -8,6 +8,8 @@
 #include "Components/ArrowComponent.h"
 #include "Camera/FollowCameraActor.h"
 #include "Controller/CubeController.h"
+#include "InputActionValue.h"
+#include "Kismet/KismetMathLibrary.h"
 
 FName APlayerPawn::PawnMeshName(TEXT("PawnMesh"));
 FVector APlayerPawn::SpawnCameraOffset(FVector(-120.0f, 0.0f, 15.0f));
@@ -93,3 +95,15 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	
 }
 
+void APlayerPawn::HandleInputMove_Implementation(const FInputActionValue& ActionValue)
+{
+	ICubeControllerInterface::HandleInputMove_Implementation(ActionValue);
+
+	DEBUG_LOG_CUSTOM_TEXT("Move - to be Implemented");
+}
+
+void APlayerPawn::HandleInputLook_Implementation(const FInputActionValue& ActionValue)
+{
+	ICubeControllerInterface::HandleInputLook_Implementation(ActionValue);
+	DEBUG_LOG_CUSTOM_TEXT("Look - to be Implemented");
+}

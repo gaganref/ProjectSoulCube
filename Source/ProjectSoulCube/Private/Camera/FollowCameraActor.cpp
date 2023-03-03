@@ -3,6 +3,7 @@
 
 #include "Camera/FollowCameraActor.h"
 
+#include "DebugLibraryCommon.h"
 #include "Camera/CameraComponent.h"
 
 // Sets default values
@@ -14,6 +15,9 @@ AFollowCameraActor::AFollowCameraActor(const FObjectInitializer& ObjectInitializ
 
 	// Setup camera defaults
 	GetCameraComponent()->bConstrainAspectRatio = false;
+
+	// Default FollowCameraActor settings.
+	CameraOffset = FVector(-120.0f, 0.0f, 15.0f);
 }
 
 // Called when the game starts or when spawned
@@ -21,12 +25,36 @@ void AFollowCameraActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	const TObjectPtr<APawn> SpawnInstigator = GetInstigator();
+	SpawnInstigator = GetInstigator();
 	
 	if(SpawnInstigator)
 	{
 		// The Follow Camera should always tick after the following pawn to avoid visual jitter 
 		PrimaryActorTick.AddPrerequisite(SpawnInstigator, SpawnInstigator->PrimaryActorTick);
+		
+		// const FVector InstigatorForwardVector = SpawnInstigator->GetActorForwardVector();
+		// const FVector TargetCameraLocation = SpawnInstigator->GetActorLocation() + InstigatorForwardVector*CameraOffset;
+		// FTransform TargetTransform = SpawnInstigator->GetActorTransform();
+		// TargetTransform.SetLocation(TargetCameraLocation);
+		const FVector TargetCameraLocation = SpawnInstigator->GetActorLocation() + SpawnInstigator->GetActorRotation().RotateVector(CameraOffset);
+#if WITH_EDITORONLY_DATA
+		if(bDebug)
+		{
+			DEBUG_PRINT_CUSTOM_TEXT(FString::Printf(TEXT("TargetCameraLocation = %s."), *TargetCameraLocation.ToString()));
+		}
+#endif
+		// SetActorTransform(TargetTransform);
+		SetActorLocation(TargetCameraLocation);
+		SetActorRotation(SpawnInstigator->GetActorRotation());
+	}
+	else
+	{
+#if WITH_EDITORONLY_DATA
+		if(bDebug)
+		{
+			DEBUG_PRINT_CUSTOM_TEXT(FString::Printf(TEXT("SpawnInstigator is naot valid.")));
+		}
+#endif		
 	}
 }
 
@@ -34,4 +62,32 @@ void AFollowCameraActor::BeginPlay()
 void AFollowCameraActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	if(SpawnInstigator)
+	{
+		// const FVector InstigatorForwardVector = SpawnInstigator->GetActorForwardVector();
+		// const FVector TargetCameraLocation = SpawnInstigator->GetActorLocation() + InstigatorForwardVector*CameraOffset;
+		// FTransform TargetTransform = SpawnInstigator->GetActorTransform();
+		// TargetTransform.SetLocation(TargetCameraLocation);
+		const FVector TargetCameraLocation = SpawnInstigator->GetActorLocation() + SpawnInstigator->GetActorRotation().RotateVector(CameraOffset);
+#if WITH_EDITORONLY_DATA
+		if(bDebug)
+		{
+			DEBUG_PRINT_CUSTOM_TEXT(FString::Printf(TEXT("TargetCameraLocation = %s."), *TargetCameraLocation.ToString()));
+		}
+#endif
+		
+		// SetActorTransform(TargetTransform);
+		SetActorLocation(TargetCameraLocation);
+		SetActorRotation(SpawnInstigator->GetActorRotation());
+	}
+	else
+	{
+#if WITH_EDITORONLY_DATA
+		if(bDebug)
+		{
+			DEBUG_PRINT_CUSTOM_TEXT(FString::Printf(TEXT("SpawnInstigator is naot valid.")));
+		}
+#endif		
+	}
 }

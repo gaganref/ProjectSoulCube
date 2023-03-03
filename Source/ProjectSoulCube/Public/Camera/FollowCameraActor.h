@@ -24,5 +24,18 @@ protected:
 
 public:	
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;	
+	virtual void Tick(float DeltaTime) override;
+
+private:
+	UPROPERTY(Category = Instigator, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", DisplayPriority = -3))
+	TObjectPtr<APawn> SpawnInstigator;
+
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(Category = Debug, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool bDebug;
+#endif
+	
+private:	
+	UPROPERTY(Category = CameraOffset, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", DisplayPriority = -3))
+	FVector CameraOffset;
 };
