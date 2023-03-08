@@ -37,5 +37,11 @@ private:
 	
 private:	
 	UPROPERTY(Category = CameraOffset, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", DisplayPriority = -3))
-	FVector CameraOffset;
+	FVector CameraLocationOffset;
+
+	UPROPERTY(Category = CameraOffset, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", DisplayPriority = -3))
+	FRotator CameraRotationOffset;
+
+protected:
+	void MoveCamera();
 };
