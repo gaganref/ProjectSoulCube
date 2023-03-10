@@ -44,6 +44,10 @@
 		{
 			"Name": "PCG",
 			"Enabled": true
+		},
+		{
+			"Name": "ProceduralLevelGenerator",
+			"Enabled": true
 		}
 	]
 }

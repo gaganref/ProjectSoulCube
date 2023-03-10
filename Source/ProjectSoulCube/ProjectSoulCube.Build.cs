@@ -8,7 +8,7 @@ public class ProjectSoulCube : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "DebugLibrary" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "DebugLibrary", "ProceduralLevelGenerator" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "EnhancedInput" });
 
