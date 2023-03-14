@@ -69,5 +69,4 @@ void AFollowCameraActor::MoveCamera()
 		}
 #endif		
 	}
-	FMath::PerlinNoise1D()
 }

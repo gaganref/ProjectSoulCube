@@ -65,15 +65,6 @@ private:
 	TObjectPtr<UArrowComponent> ArrowComponent;
 #endif
 
-public:
-	/** Returns PawnMesh. */
-	FORCEINLINE TObjectPtr<UStaticMeshComponent> GetPawnMesh() const {return PawnMesh;}
-
-#if WITH_EDITORONLY_DATA
-	/** Returns ArrowComponent **/
-	FORCEINLINE TObjectPtr<UArrowComponent> GetArrowComponent() const { return ArrowComponent; }
-#endif
-
 private:
 
 	/** Class of the player follow camera that should be spawned. */
@@ -89,6 +80,15 @@ private:
 	TObjectPtr<ACubeController> PlayerControllerRef;
 	
 public:
+
+	/** Returns PawnMesh. */
+	FORCEINLINE TObjectPtr<UStaticMeshComponent> GetPawnMesh() const {return PawnMesh;}
+
+#if WITH_EDITORONLY_DATA
+	/** Returns ArrowComponent **/
+	FORCEINLINE TObjectPtr<UArrowComponent> GetArrowComponent() const { return ArrowComponent; }
+#endif
+	
 	/** Returns Follow Camera */
 	FORCEINLINE TObjectPtr<AFollowCameraActor> GetFollowCameraActor() const { return FollowCamera;}
 
