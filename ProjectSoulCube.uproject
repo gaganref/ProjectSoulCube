@@ -48,6 +48,14 @@
 		{
 			"Name": "ProceduralLevelGenerator",
 			"Enabled": true
+		},
+		{
+			"Name": "Water",
+			"Enabled": true
+		},
+		{
+			"Name": "WaterExtras",
+			"Enabled": true
 		}
 	]
 }
