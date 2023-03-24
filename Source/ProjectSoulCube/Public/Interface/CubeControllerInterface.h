@@ -27,7 +27,6 @@ public:
 	// Interface to handle movement input 
 	UFUNCTION(Category = "CubeControllerInterface|Input", BlueprintNativeEvent, BlueprintCallable, meta = (DisplayName = "Handle Move"))
 	void HandleInputMove(const FInputActionValue& ActionValue);
-	// virtual void HandleInputMove_Implementation(FInputActionValue& ActionValue) = 0;
 
 	// Interface to handle look input
 	UFUNCTION(Category = "CubeControllerInterface|Input", BlueprintNativeEvent, BlueprintCallable, meta = (DisplayName = "Handle Look"))
