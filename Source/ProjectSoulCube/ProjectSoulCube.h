@@ -4,3 +4,5 @@
 
 #include "CoreMinimal.h"
 
+// Log Categories
+PROJECTSOULCUBE_API DECLARE_LOG_CATEGORY_EXTERN(LogSoulCubeSystem, Log, All);
