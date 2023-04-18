@@ -76,11 +76,15 @@ protected:
 	// Default attributes for a character for initializing on spawn/respawn.
 	// This is an instant GE that overrides the values for attributes that get reset on spawn/respawn.
 	UPROPERTY(Category = "Ability System", EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<class UGameplayEffect> DefaultAttributes;
+	TSubclassOf<class USCGameplayEffect> DefaultAttributes;
 
 	// These effects are only applied one time on startup
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "GASDocumentation|Abilities")
-	TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability System")
+	TArray<TSubclassOf<class USCGameplayEffect>> StartupEffects;
+
+	// Default abilities for this Character. These will be removed on Character death and re-given if Character respawns.
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability System")
+	TArray<TSubclassOf<class USCGameplayAbility>> CharacterAbilities;
 	
 	
 public:
@@ -90,11 +94,13 @@ public:
 
 protected:
 
-	void InitializeCustomCamera();
+	virtual void InitializeCustomCamera();
 
-	void InitializeAttributes();
+	virtual void InitializeAttributes();
 
-	void AddStartupEffects();
+	virtual void AddStartupEffects();
+
+	virtual void AddCharacterAbilities();
 	
 	// Interface to handle movement input 
 	UFUNCTION(Category = "CubeControllerInterface", BlueprintNativeEvent, BlueprintCallable, meta = (DisplayName = "Handle Move"))
@@ -107,8 +113,8 @@ protected:
 	virtual void HandleInputLook_Implementation(const FInputActionValue& ActionValue) override;
 
 protected:
-
-	void PossessedBy(AController* NewController) override;
+	
+	virtual void PossessedBy(AController* NewController) override;
 	
 public:
 
@@ -119,11 +125,17 @@ public:
 
 public:
 
-	UFUNCTION(BlueprintCallable, Category = "GASDocumentation|GDCharacter|Attributes")
+	UFUNCTION(BlueprintCallable, Category = "Character|Attributes")
 	float GetHealth() const;
 
-	UFUNCTION(BlueprintCallable, Category = "GASDocumentation|GDCharacter|Attributes")
+	UFUNCTION(BlueprintCallable, Category = "Character|Attributes")
 	float GetMaxHealth() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Character|Attributes")
+	float GetHealthRegenRate() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Character|Attributes")
+	virtual bool IsAlive() const;
 	
 public:
 

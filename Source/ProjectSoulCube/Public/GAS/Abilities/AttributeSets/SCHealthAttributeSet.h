@@ -38,6 +38,11 @@ public:
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(USCHealthAttributeSet, MaxHealth)
 
+	// Health regen rate will passively increase Health every second
+	UPROPERTY(BlueprintReadOnly, Category = "Health")
+	FGameplayAttributeData HealthRegenRate;
+	ATTRIBUTE_ACCESSORS(USCHealthAttributeSet, HealthRegenRate)
+
 	// Damage is a meta attribute used by the DamageExecution to calculate final damage, which then turns into -Health
 	// Temporary value that only exists on the Server. Not replicated.
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
@@ -47,7 +52,9 @@ public:
 public:
 
 	// AttributeSet Overrides
+	
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 protected:
@@ -55,5 +62,4 @@ protected:
 	// Helper function to proportionally adjust the value of an attribute when it's associated max attribute changes.
 	// (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before)
 	void AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
-	
 };

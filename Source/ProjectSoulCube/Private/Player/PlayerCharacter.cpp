@@ -11,10 +11,13 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GAS/SCAbilitySystemComponent.h"
+#include "GAS/Abilities/SCGameplayAbility.h"
 #include "GAS/Abilities/AttributeSets/SCHealthAttributeSet.h"
+#include "GAS/GameplayEffects/SCGameplayEffect.h"
+#include "Player/SCPlayerState.h"
 #include "ProjectSoulCube/ProjectSoulCube.h"
 
-FVector APlayerCharacter::SpawnCameraOffset(FVector(-215.0f, 85.0f, 45.0f));
+FVector APlayerCharacter::SpawnCameraOffset(FVector(-120.0f, 50.0f, 45.0f));
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -36,10 +39,10 @@ APlayerCharacter::APlayerCharacter()
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(40.f, 77.0f);
 	
-	// Don't rotate when the controller rotates. Let that just affect the camera. Except Yaw
+	// Don't rotate when the controller rotates. Let that just affect the camera. Except Yaw and Roll
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
-	bUseControllerRotationRoll = false;
+	bUseControllerRotationRoll = true;
 }
 
 // Called when the game starts or when spawned
@@ -148,6 +151,8 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 		InitializeAttributes();
 
 		AddStartupEffects();
+
+		AddCharacterAbilities();
 	}
 	
 	// ASC MixedMode replication requires that the ASC Owner's Owner be the Controller.
@@ -192,7 +197,7 @@ void APlayerCharacter::AddStartupEffects()
 	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
 
-	for (const TSubclassOf<UGameplayEffect> GameplayEffect : StartupEffects)
+	for (const TSubclassOf<USCGameplayEffect> GameplayEffect : StartupEffects)
 	{
 		FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, 1/*GetCharacterLevel()*/, EffectContext);
 		if (NewHandle.IsValid())
@@ -202,6 +207,23 @@ void APlayerCharacter::AddStartupEffects()
 	}
 
 	AbilitySystemComponent->SetStartupEffectsApplied(true);
+}
+
+void APlayerCharacter::AddCharacterAbilities()
+{
+	// Grant abilities, but only on the server	
+	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent || AbilitySystemComponent->AreStartupEffectsApplied())
+	{
+		return;
+	}
+
+	// for (TSubclassOf<USCGameplayAbility>& StartupAbility : CharacterAbilities)
+	// {
+	// 	AbilitySystemComponent->GiveAbility(
+	// 		FGameplayAbilitySpec(StartupAbility, GetAbilityLevel(StartupAbility.GetDefaultObject()->AbilityID), static_cast<int32>(StartupAbility.GetDefaultObject()->AbilityInputID), this));
+	// }
+
+	AbilitySystemComponent->SetCharacterAbilitiesGiven(true);
 }
 
 float APlayerCharacter::GetHealth() const
@@ -222,6 +244,21 @@ float APlayerCharacter::GetMaxHealth() const
 	}
 
 	return 0.0f;
+}
+
+float APlayerCharacter::GetHealthRegenRate() const
+{
+	if(HealthAttributeSet)
+	{
+		return HealthAttributeSet->GetHealthRegenRate();
+	}
+
+	return 0.0f;
+}
+
+bool APlayerCharacter::IsAlive() const
+{
+	return GetHealth() > 0.0f;
 }
 
 void APlayerCharacter::SetHealth(float Health)

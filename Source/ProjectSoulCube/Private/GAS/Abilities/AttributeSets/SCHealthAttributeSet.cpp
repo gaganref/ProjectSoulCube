@@ -5,6 +5,8 @@
 
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/PlayerCharacter.h"
+#include "ProjectSoulCube/ProjectSoulCube.h"
 
 USCHealthAttributeSet::USCHealthAttributeSet()
 {
@@ -24,61 +26,75 @@ void USCHealthAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 {
 	Super::PostGameplayEffectExecute(Data);
 
-	// TODO:
-	// FGameplayEffectContextHandle Context = Data.EffectSpec.GetContext();
-	// UAbilitySystemComponent* Source = Context.GetOriginalInstigatorAbilitySystemComponent();
-	// const FGameplayTagContainer& SourceTags = *Data.EffectSpec.CapturedSourceTags.GetAggregatedTags();
-	// FGameplayTagContainer SpecAssetTags;
-	// Data.EffectSpec.GetAllAssetTags(SpecAssetTags);
-	//
-	// // Get the Target actor, which should be our owner
-	// AActor* TargetActor = nullptr;
-	// AController* TargetController = nullptr;
-	// AGDCharacterBase* TargetCharacter = nullptr;
-	// if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
-	// {
-	// 	TargetActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
-	// 	TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
-	// 	TargetCharacter = Cast<AGDCharacterBase>(TargetActor);
-	// }
-	//
-	// // Get the Source actor
-	// AActor* SourceActor = nullptr;
-	// AController* SourceController = nullptr;
-	// AGDCharacterBase* SourceCharacter = nullptr;
-	// if (Source && Source->AbilityActorInfo.IsValid() && Source->AbilityActorInfo->AvatarActor.IsValid())
-	// {
-	// 	SourceActor = Source->AbilityActorInfo->AvatarActor.Get();
-	// 	SourceController = Source->AbilityActorInfo->PlayerController.Get();
-	// 	if (SourceController == nullptr && SourceActor != nullptr)
-	// 	{
-	// 		if (APawn* Pawn = Cast<APawn>(SourceActor))
-	// 		{
-	// 			SourceController = Pawn->GetController();
-	// 		}
-	// 	}
-	//
-	// 	// Use the controller to find the source pawn
-	// 	if (SourceController)
-	// 	{
-	// 		SourceCharacter = Cast<AGDCharacterBase>(SourceController->GetPawn());
-	// 	}
-	// 	else
-	// 	{
-	// 		SourceCharacter = Cast<AGDCharacterBase>(SourceActor);
-	// 	}
-	//
-	// 	// Set the causer actor based on context if it's set
-	// 	if (Context.GetEffectCauser())
-	// 	{
-	// 		SourceActor = Context.GetEffectCauser();
-	// 	}
-	// }
+	FGameplayEffectContextHandle Context = Data.EffectSpec.GetContext();
+	UAbilitySystemComponent* Source = Context.GetOriginalInstigatorAbilitySystemComponent();
+	const FGameplayTagContainer& SourceTags = *Data.EffectSpec.CapturedSourceTags.GetAggregatedTags();
+	FGameplayTagContainer SpecAssetTags;
+	Data.EffectSpec.GetAllAssetTags(SpecAssetTags);
+	
+	// Get the Target actor, which should be our owner
+	AActor* TargetActor = nullptr;
+	AController* TargetController = nullptr;
+	APlayerCharacter* TargetCharacter = nullptr;
+	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
+	{
+		TargetActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+		TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
+		TargetCharacter = Cast<APlayerCharacter>(TargetActor);
+	}
+	
+	// Get the Source actor
+	AActor* SourceActor = nullptr;
+	AController* SourceController = nullptr;
+	APlayerCharacter* SourceCharacter = nullptr;
+	if (Source && Source->AbilityActorInfo.IsValid() && Source->AbilityActorInfo->AvatarActor.IsValid())
+	{
+		SourceActor = Source->AbilityActorInfo->AvatarActor.Get();
+		SourceController = Source->AbilityActorInfo->PlayerController.Get();
+		if (SourceController == nullptr && SourceActor != nullptr)
+		{
+			if (APawn* Pawn = Cast<APawn>(SourceActor))
+			{
+				SourceController = Pawn->GetController();
+			}
+		}
+	
+		// Use the controller to find the source pawn
+		if (SourceController)
+		{
+			SourceCharacter = Cast<APlayerCharacter>(SourceController->GetPawn());
+		}
+		else
+		{
+			SourceCharacter = Cast<APlayerCharacter>(SourceActor);
+		}
+	
+		// Set the causer actor based on context if it's set
+		if (Context.GetEffectCauser())
+		{
+			SourceActor = Context.GetEffectCauser();
+		}
+	}
 
 	// Damage
 	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
-		// TODO:
+		// Store a local copy of the amount of damage done and clear the damage attribute
+		const float LocalDamageDone = GetDamage();
+		SetDamage(0.f);
+
+		if (LocalDamageDone > 0.0f)
+		{
+			if (!TargetCharacter->IsAlive())
+			{
+				UE_LOG(LogSoulCubeGAS, Warning, TEXT("%s() %s is NOT alive when receiving damage"), TEXT(__FUNCTION__), *TargetCharacter->GetName());
+			}
+
+			// Apply the health change and then clamp it
+			const float NewHealth = GetHealth() - LocalDamageDone;
+			SetHealth(FMath::Clamp(NewHealth, 0.0f, GetMaxHealth()));
+		}
+		
 	}// Health
 	else if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
@@ -86,8 +102,8 @@ void USCHealthAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 		// Health loss should go through Damage.
 		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
 	}
+	
 }
-
 
 void USCHealthAttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute,
                                                         const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty)

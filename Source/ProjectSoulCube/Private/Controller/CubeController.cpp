@@ -75,15 +75,3 @@ void ACubeController::HandleLook(const FInputActionValue& ActionValue)
 		ICubeControllerInterface::Execute_HandleInputLook(PawnRef, ActionValue);
 	}
 }
-
-void ACubeController::AcknowledgePossession(APawn* P)
-{
-	Super::AcknowledgePossession(P);
-
-	const TObjectPtr<IAbilitySystemInterface> ASIActor = Cast<IAbilitySystemInterface>(P);
-
-	if(ASIActor)
-	{
-		ASIActor->GetAbilitySystemComponent()->InitAbilityActorInfo(P, P);
-	}
-}
