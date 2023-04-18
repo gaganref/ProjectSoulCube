@@ -3,6 +3,8 @@
 
 #include "Controller/CubeController.h"
 
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemInterface.h"
 #include "DebugLibraryCommon.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
@@ -71,5 +73,17 @@ void ACubeController::HandleLook(const FInputActionValue& ActionValue)
 	if(PawnRef)
 	{
 		ICubeControllerInterface::Execute_HandleInputLook(PawnRef, ActionValue);
+	}
+}
+
+void ACubeController::AcknowledgePossession(APawn* P)
+{
+	Super::AcknowledgePossession(P);
+
+	const TObjectPtr<IAbilitySystemInterface> ASIActor = Cast<IAbilitySystemInterface>(P);
+
+	if(ASIActor)
+	{
+		ASIActor->GetAbilitySystemComponent()->InitAbilityActorInfo(P, P);
 	}
 }

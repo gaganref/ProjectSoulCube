@@ -8,6 +8,11 @@
 #include "Camera/FollowCameraActor.h"
 #include "Controller/CubeController.h"
 #include "InputActionValue.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "GAS/SCAbilitySystemComponent.h"
+#include "GAS/Abilities/AttributeSets/SCHealthAttributeSet.h"
+#include "ProjectSoulCube/ProjectSoulCube.h"
 
 FVector APlayerCharacter::SpawnCameraOffset(FVector(-215.0f, 85.0f, 45.0f));
 
@@ -17,6 +22,17 @@ APlayerCharacter::APlayerCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("Camera Boom"));
+	CameraBoom->SetupAttachment(GetCapsuleComponent());
+	CameraBoom->SocketOffset = SpawnCameraOffset;
+
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(CameraBoom);
+	
+	AbilitySystemComponent = CreateDefaultSubobject<USCAbilitySystemComponent>(TEXT("Ability System Component"));
+	HealthAttributeSet = CreateDefaultSubobject<USCHealthAttributeSet>(TEXT("Health Attribute Set"));
+	
+	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(40.f, 77.0f);
 	
@@ -31,39 +47,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	const TObjectPtr<UWorld> World = GetWorld();
-	check(World);
-	
-	Super::BeginPlay();
-
-	PlayerControllerRef = Cast<ACubeController>(GetController());
-	
-	if(!FollowCameraClass)
-	{
-		FollowCameraClass = AFollowCameraActor::StaticClass();
-	}
-	FActorSpawnParameters CameraSpawnParameters;
-	CameraSpawnParameters.Instigator = this;
-	CameraSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	FTransform SpawnTransform = GetTransform();
-	const FVector RotatedSpawnOffset = SpawnTransform.GetRotation().RotateVector(SpawnCameraOffset);
-	SpawnTransform.SetLocation(SpawnTransform.GetLocation() + RotatedSpawnOffset);
-	FollowCamera = World->SpawnActor<AFollowCameraActor>(FollowCameraClass->GetDefaultObject()->GetClass(), SpawnTransform, CameraSpawnParameters);
-	check(FollowCamera);
-
-	if(PlayerControllerRef)
-	{
-		PlayerControllerRef->SetViewTarget(FollowCamera);
-	}
-	else
-	{
-#if WITH_EDITORONLY_DATA
-		if(bDebug)
-		{
-			DEBUG_PRINT_CUSTOM_TEXT_WITH_INFO(TEXT("PlayerControllerRef is not valid."));
-		}
-#endif
-	}
+	InitializeCustomCamera();
 }
 
 // Called every frame
@@ -73,11 +57,41 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 }
 
-// Called to bind functionality to input
-void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+void APlayerCharacter::InitializeCustomCamera()
+{
+	const TObjectPtr<UWorld> World = GetWorld();
+	check(World);
+	
+	PlayerControllerRef = Cast<ACubeController>(GetController());
+
+	if(bUseCustomFollowCamera)
+	{
+		if(!FollowCameraClass)
+		{
+			FollowCameraClass = AFollowCameraActor::StaticClass();
+		}
+		FActorSpawnParameters CameraSpawnParameters;
+		CameraSpawnParameters.Instigator = this;
+		CameraSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		FTransform SpawnTransform = GetTransform();
+		const FVector RotatedSpawnOffset = SpawnTransform.GetRotation().RotateVector(SpawnCameraOffset);
+		SpawnTransform.SetLocation(SpawnTransform.GetLocation() + RotatedSpawnOffset);
+		FollowCamera = World->SpawnActor<AFollowCameraActor>(FollowCameraClass->GetDefaultObject()->GetClass(), SpawnTransform, CameraSpawnParameters);
+		check(FollowCamera);
+
+		if(PlayerControllerRef)
+		{
+			PlayerControllerRef->SetViewTarget(FollowCamera);
+		}
+		else
+		{
+			if(bDebug)
+			{
+				DEBUG_PRINT_CUSTOM_TEXT_WITH_INFO(TEXT("PlayerControllerRef is not valid."));
+			}
+		}
+	}	
 }
 
 void APlayerCharacter::HandleInputMove_Implementation(const FInputActionValue& ActionValue)
@@ -117,5 +131,103 @@ void APlayerCharacter::HandleInputLook_Implementation(const FInputActionValue& A
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void APlayerCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+		// Set Health to their max. This is only necessary for *Respawn*.
+		SetHealth(GetMaxHealth());
+		
+		InitializeAttributes();
+
+		AddStartupEffects();
+	}
+	
+	// ASC MixedMode replication requires that the ASC Owner's Owner be the Controller.
+	SetOwner(NewController);
+}
+
+UAbilitySystemComponent* APlayerCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
+void APlayerCharacter::InitializeAttributes()
+{
+	if (!AbilitySystemComponent)
+	{
+		return;
+	}
+
+	if (!DefaultAttributes)
+	{
+		UE_LOG(LogSoulCubeGAS, Error, TEXT("%s() Missing DefaultAttributes for %s. Please fill in the character's Blueprint."), *FString(__FUNCTION__), *GetName());
+		return;
+	}
+
+	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAttributes, 1/*GetCharacterLevel()*/, EffectContext);
+	if (NewHandle.IsValid())
+	{
+		FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent.Get());
+	}
+}
+
+void APlayerCharacter::AddStartupEffects()
+{
+	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent || AbilitySystemComponent->AreStartupEffectsApplied())
+	{
+		return;
+	}
+
+	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	for (const TSubclassOf<UGameplayEffect> GameplayEffect : StartupEffects)
+	{
+		FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, 1/*GetCharacterLevel()*/, EffectContext);
+		if (NewHandle.IsValid())
+		{
+			FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent.Get());
+		}
+	}
+
+	AbilitySystemComponent->SetStartupEffectsApplied(true);
+}
+
+float APlayerCharacter::GetHealth() const
+{
+	if(HealthAttributeSet)
+	{
+		return HealthAttributeSet->GetHealth();
+	}
+
+	return 0.0f;
+}
+
+float APlayerCharacter::GetMaxHealth() const
+{
+	if(HealthAttributeSet)
+	{
+		return HealthAttributeSet->GetMaxHealth();
+	}
+
+	return 0.0f;
+}
+
+void APlayerCharacter::SetHealth(float Health)
+{
+	if(HealthAttributeSet)
+	{
+		HealthAttributeSet->SetHealth(Health);
 	}
 }

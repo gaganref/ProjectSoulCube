@@ -7,3 +7,4 @@ IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, ProjectSoulCube, "Project
 
 //Log Categories
 DEFINE_LOG_CATEGORY(LogSoulCubeSystem);
+DEFINE_LOG_CATEGORY(LogSoulCubeGAS);

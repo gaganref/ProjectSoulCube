@@ -62,4 +62,8 @@ protected:
 
 	// Called to handle look input 
 	void HandleLook(const FInputActionValue& ActionValue);
+
+protected:
+	
+	virtual void AcknowledgePossession(APawn* P) override;
 };
