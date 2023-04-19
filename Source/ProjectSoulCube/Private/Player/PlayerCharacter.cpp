@@ -9,6 +9,7 @@
 #include "Controller/CubeController.h"
 #include "InputActionValue.h"
 #include "Camera/CameraComponent.h"
+#include "Components/InteractionDetectionComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GAS/SCAbilitySystemComponent.h"
 #include "GAS/Abilities/SCGameplayAbility.h"
@@ -31,6 +32,8 @@ APlayerCharacter::APlayerCharacter()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(CameraBoom);
+
+	InteractionDetectionComponent = CreateDefaultSubobject<UInteractionDetectionComponent>(TEXT("Interaction Detection Component"));
 	
 	AbilitySystemComponent = CreateDefaultSubobject<USCAbilitySystemComponent>(TEXT("Ability System Component"));
 	HealthAttributeSet = CreateDefaultSubobject<USCHealthAttributeSet>(TEXT("Health Attribute Set"));

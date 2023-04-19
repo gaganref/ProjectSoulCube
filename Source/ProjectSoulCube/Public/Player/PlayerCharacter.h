@@ -66,6 +66,9 @@ private:
 
 protected:
 
+	UPROPERTY(Category = "Ability System", EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UInteractionDetectionComponent> InteractionDetectionComponent;
+
 	/** Ability System Component. Required to use Gameplay Attributes and Gameplay Abilities. */
 	UPROPERTY(Category = "Ability System", EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<class USCAbilitySystemComponent> AbilitySystemComponent;
