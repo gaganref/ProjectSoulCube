@@ -87,7 +87,7 @@ void USCHealthAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 		{
 			if (!TargetCharacter->IsAlive())
 			{
-				UE_LOG(LogSoulCubeGAS, Warning, TEXT("%s() %s is NOT alive when receiving damage"), TEXT(__FUNCTION__), *TargetCharacter->GetName());
+				UE_LOG(LogSoulCubeGAS, Warning, TEXT("%s is NOT alive when receiving damage"), *TargetCharacter->GetName());
 			}
 
 			// Apply the health change and then clamp it

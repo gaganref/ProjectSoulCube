@@ -124,7 +124,7 @@ public:
 	//~ End IAbilitySystemInterface
 
 public:
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Character|Attributes")
 	float GetHealth() const;
 
