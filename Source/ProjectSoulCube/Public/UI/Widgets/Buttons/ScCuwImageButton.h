@@ -19,7 +19,7 @@ private:
 	TObjectPtr<class UImage> Image;
 	
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativePreConstruct() override;
 
 public:
 	// Getters

@@ -5,9 +5,9 @@
 
 #include "CommonTextBlock.h"
 
-void UScCuwTextButton::NativeConstruct()
+void UScCuwTextButton::NativePreConstruct()
 {
-	Super::NativeConstruct();
+	Super::NativePreConstruct();
 
 	TextBlock->SetText(Text);
 }

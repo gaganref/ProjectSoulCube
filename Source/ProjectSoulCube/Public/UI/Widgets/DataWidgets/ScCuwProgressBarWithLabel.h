@@ -16,13 +16,13 @@ class PROJECTSOULCUBE_API UScCuwProgressBarWithLabel : public UCommonUserWidget
 
 	
 private:
-	UPROPERTY(EditAnywhere, BlueprintGetter = GetWidth, BlueprintSetter = SetWidth, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintGetter = GetWidth, BlueprintSetter = SetWidth)
 	float Width;
 	
-	UPROPERTY(EditAnywhere, BlueprintGetter = GetHeight, BlueprintSetter = SetHeight, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintGetter = GetHeight, BlueprintSetter = SetHeight)
 	float Height;
 	
-	UPROPERTY(EditAnywhere, BlueprintGetter = GetText, BlueprintSetter = SetText, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintGetter = GetText, BlueprintSetter = SetText)
 	FText Text;
 	
 private:
@@ -36,7 +36,7 @@ private:
 	TObjectPtr<class UCommonTextBlock> TextBlock;
 
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativePreConstruct() override;
 
 public:
 	// Getters

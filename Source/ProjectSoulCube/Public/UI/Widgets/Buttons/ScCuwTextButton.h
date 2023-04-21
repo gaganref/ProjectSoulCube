@@ -15,7 +15,7 @@ class PROJECTSOULCUBE_API UScCuwTextButton : public UScCuwButtonWidgetBase
 	GENERATED_BODY()
 	
 private:
-	UPROPERTY(EditAnywhere, BlueprintGetter = GetText, BlueprintSetter = SetText, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintGetter = GetText, BlueprintSetter = SetText)
 	FText Text;
 
 private:	
@@ -23,7 +23,7 @@ private:
 	TObjectPtr<class UCommonTextBlock> TextBlock;
 	
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativePreConstruct() override;
 
 public:
 	// Getters

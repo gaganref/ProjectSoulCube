@@ -3,9 +3,9 @@
 
 #include "../../../../Public/UI/Widgets/Buttons/ScCuwImageButton.h"
 
-void UScCuwImageButton::NativeConstruct()
+void UScCuwImageButton::NativePreConstruct()
 {
-	Super::NativeConstruct();
+	Super::NativePreConstruct();
 }
 
 UImage* UScCuwImageButton::GetImage() const

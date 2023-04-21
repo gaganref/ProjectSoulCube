@@ -5,9 +5,9 @@
 
 #include "Components/SizeBox.h"
 
-void UScCuwButtonWidgetBase::NativeConstruct()
+void UScCuwButtonWidgetBase::NativePreConstruct()
 {
-	Super::NativeConstruct();
+	Super::NativePreConstruct();
 
 	SizeBox->SetWidthOverride(Width);
 	SizeBox->SetHeightOverride(Height);

@@ -3,14 +3,17 @@
 
 #include "UI/Widgets/DataWidgets/ScCuwProgressBarWithLabel.h"
 
+#include "CommonTextBlock.h"
 #include "Components/SizeBox.h"
 
-void UScCuwProgressBarWithLabel::NativeConstruct()
+void UScCuwProgressBarWithLabel::NativePreConstruct()
 {
-	Super::NativeConstruct();
-
+	Super::NativePreConstruct();
+	
 	SizeBox->SetWidthOverride(Width);
 	SizeBox->SetHeightOverride(Height);
+
+	TextBlock->SetText(Text);
 }
 
 float UScCuwProgressBarWithLabel::GetWidth() const
