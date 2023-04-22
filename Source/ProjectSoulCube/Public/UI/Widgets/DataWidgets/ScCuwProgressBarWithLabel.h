@@ -4,31 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "CommonUserWidget.h"
+#include "UI/Widgets/ScCommonUserWidget.h"
 #include "ScCuwProgressBarWithLabel.generated.h"
 
 /**
  * 
  */
 UCLASS(Abstract, Blueprintable)
-class PROJECTSOULCUBE_API UScCuwProgressBarWithLabel : public UCommonUserWidget
+class PROJECTSOULCUBE_API UScCuwProgressBarWithLabel : public UScCommonUserWidget
 {
 	GENERATED_BODY()
 
 	
 private:
-	UPROPERTY(EditAnywhere, BlueprintGetter = GetWidth, BlueprintSetter = SetWidth)
-	float Width;
-	
-	UPROPERTY(EditAnywhere, BlueprintGetter = GetHeight, BlueprintSetter = SetHeight)
-	float Height;
-	
 	UPROPERTY(EditAnywhere, BlueprintGetter = GetText, BlueprintSetter = SetText)
 	FText Text;
 	
 private:
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class USizeBox> SizeBox;
-	
 	UPROPERTY(BlueprintGetter = GetProgressBar, meta = (BindWidget))
 	TObjectPtr<class UProgressBar> ProgressBar;
 
@@ -42,12 +34,6 @@ public:
 	// Getters
 
 	UFUNCTION(BlueprintGetter)
-	float GetWidth() const;
-
-	UFUNCTION(BlueprintGetter)
-	float GetHeight() const;
-
-	UFUNCTION(BlueprintGetter)
 	FText GetText() const;
 	
 	UFUNCTION(BlueprintGetter)
@@ -58,12 +44,6 @@ public:
 
 public:
 	// Setters
-
-	UFUNCTION(BlueprintSetter)
-	void SetWidth(const float NewWidth);
-
-	UFUNCTION(BlueprintSetter)
-	void SetHeight(const float NewHeight);
 
 	UFUNCTION(BlueprintSetter)
 	void SetText(const FText& NewText);

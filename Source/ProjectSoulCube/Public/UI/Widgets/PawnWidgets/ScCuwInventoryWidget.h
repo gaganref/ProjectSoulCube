@@ -3,15 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CommonNumericTextBlock.h"
-#include "ScCuwNumericTextBlock.generated.h"
+#include "CommonUserWidget.h"
+#include "UI/Widgets/ScCommonUserWidget.h"
+#include "ScCuwInventoryWidget.generated.h"
 
 /**
  * 
  */
 UCLASS(Abstract, Blueprintable)
-class PROJECTSOULCUBE_API UScCuwNumericTextBlock : public UCommonUserWidget
+class PROJECTSOULCUBE_API UScCuwInventoryWidget : public UScCommonUserWidget
 {
 	GENERATED_BODY()
+
 	
 };

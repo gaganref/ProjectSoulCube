@@ -9,7 +9,7 @@ void UScCuwTextButton::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 
-	TextBlock->SetText(Text);
+	SetText(Text);
 }
 
 FText UScCuwTextButton::GetText() const
@@ -24,5 +24,9 @@ UCommonTextBlock* UScCuwTextButton::GetTextBlock() const
 
 void UScCuwTextButton::SetText(const FText& NewText)
 {
-	Text = NewText;
+	if(TextBlock)
+	{
+		Text = NewText;
+		TextBlock->SetText(Text);	
+	}
 }

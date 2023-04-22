@@ -46,5 +46,6 @@ protected:
 	 *   Traces from start to end with given params, runs every tick to look for Interactable objects.
 	 */
 	virtual void LookForInteractable();
-	
+
+	virtual void DrawDebugShape(const UWorld* World, const bool bHit, const FVector& StartPoint, const FVector& EndPoint, const FHitResult& HitResult);
 };

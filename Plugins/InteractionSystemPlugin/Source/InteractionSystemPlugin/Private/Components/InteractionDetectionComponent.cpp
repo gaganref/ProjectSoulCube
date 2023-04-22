@@ -3,6 +3,7 @@
 
 #include "Components/InteractionDetectionComponent.h"
 
+#include "Engine/Private/KismetTraceUtils.h"
 #include "Interface/InteractableInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -46,6 +47,12 @@ void UInteractionDetectionComponent::LookForInteractable()
 		return;
 	}
 
+	const TObjectPtr<UWorld> World = GetWorld();
+	if(!World)
+	{
+		return;
+	}
+
 	FVector Location;
 	FRotator Rotation;
 	FHitResult HitResult;
@@ -56,9 +63,7 @@ void UInteractionDetectionComponent::LookForInteractable()
 	FVector EndPoint = StartPoint + (Rotation.Vector() * TraceDistance);
 
 	FCollisionQueryParams TraceParams;
-	const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartPoint, EndPoint, ECC_Visibility, TraceParams);
-
-	bool bHitValidActor = false;
+	const bool bHit = World->LineTraceSingleByChannel(HitResult, StartPoint, EndPoint, ECC_Visibility, TraceParams);
 	
 	if(bHit)
 	{
@@ -82,28 +87,45 @@ void UInteractionDetectionComponent::LookForInteractable()
 					IInteractableInterface::Execute_BeginFocus(HitActor, OwnerPawn);
 					FocusedActor = HitActor;
 				}
-				// FocusedActor = HitActor;
+				else
+				{
+					FocusedActor = nullptr;
+				}
 			}
 		}
 		
 	}
 	
-	if(bDebug)
-	{
-		FColor DrawColor = FColor::Red;
-		FColor HitPointColor = FColor::Yellow;
-		
-		if(FocusedActor)
-		{
-			DrawColor = FColor::Green;
-			HitPointColor = FColor::Blue;
-		}
-		
-		DrawDebugLine(GetWorld(), StartPoint, EndPoint, DrawColor, false, 1.0f);
+	DrawDebugShape(World, bHit, StartPoint, EndPoint, HitResult);
+}
 
-		if(bHit)
-		{
-			DrawDebugSolidBox(GetWorld(), HitResult.ImpactPoint, FVector(3, 3, 3), HitPointColor, false, 1.0f);
-		}
+void UInteractionDetectionComponent::DrawDebugShape(const UWorld* World, const bool bHit, const FVector& StartPoint, const FVector& EndPoint, const FHitResult& HitResult)
+{
+	if(!World)
+	{
+		return;
 	}
+	if(!bDebug)
+	{
+		return;
+	}
+
+	FColor DrawColor = FColor::Red;
+	FColor HitPointColor = FColor::Yellow;
+	constexpr float LifeTime = 1.0f;
+		
+	if(FocusedActor)
+	{
+		DrawColor = FColor::Green;
+		HitPointColor = FColor::Blue;
+	}
+
+	DrawDebugLine(World, StartPoint, EndPoint, DrawColor, false, LifeTime);
+
+	if(bHit)
+	{
+		DrawDebugSolidBox(World, HitResult.ImpactPoint, FVector(3, 3, 3), HitPointColor, false, LifeTime);
+	}
+	
+	
 }

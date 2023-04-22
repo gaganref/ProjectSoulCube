@@ -4,28 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "CommonUserWidget.h"
+#include "UI/Widgets/ScCommonUserWidget.h"
 #include "ScCuwButtonWidgetBase.generated.h"
 
 /**
  * 
  */
 UCLASS(Abstract, Blueprintable)
-class PROJECTSOULCUBE_API UScCuwButtonWidgetBase : public UCommonUserWidget
+class PROJECTSOULCUBE_API UScCuwButtonWidgetBase : public UScCommonUserWidget
 {
 	GENERATED_BODY()
 
-	
 private:
-	UPROPERTY(EditAnywhere, BlueprintGetter = GetWidth, BlueprintSetter = SetWidth)
-	float Width;
-	
-	UPROPERTY(EditAnywhere, BlueprintGetter = GetHeight, BlueprintSetter = SetHeight)
-	float Height;
-	
-private:
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class USizeBox> SizeBox;
-	
 	UPROPERTY(BlueprintGetter = GetButton, meta = (BindWidget))
 	TObjectPtr<class UScCbbButton> Button;
 
@@ -34,23 +24,8 @@ protected:
 
 public:
 	// Getters
-
-	UFUNCTION(BlueprintGetter)
-	float GetWidth() const;
-
-	UFUNCTION(BlueprintGetter)
-	float GetHeight() const;
 	
 	UFUNCTION(BlueprintGetter)
 	class UScCbbButton* GetButton() const;
-
-public:
-	// Setters
-
-	UFUNCTION(BlueprintSetter)
-	void SetWidth(const float NewWidth);
-
-	UFUNCTION(BlueprintSetter)
-	void SetHeight(const float NewHeight);
 	
 };

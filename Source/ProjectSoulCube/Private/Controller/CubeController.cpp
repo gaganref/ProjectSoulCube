@@ -28,19 +28,22 @@ void ACubeController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
 	}
-	
-	if(GetPawn()->GetClass()->ImplementsInterface(UCubeControllerInterface::StaticClass()))
+
+	if(GetPawn())
 	{
-		PawnRef = GetPawn();
-	}
-	else
-	{
-#if WITH_EDITORONLY_DATA
-		if(bDebug)
+		if(GetPawn()->GetClass()->ImplementsInterface(UCubeControllerInterface::StaticClass()))
 		{
-			DEBUG_PRINT_CUSTOM_TEXT_WITH_INFO(TEXT("PawnRef is not valid. - Check if it implements the required interfaces"));
+			PawnRef = GetPawn();
 		}
+		else
+		{
+#if WITH_EDITORONLY_DATA
+			if(bDebug)
+			{
+				DEBUG_PRINT_CUSTOM_TEXT_WITH_INFO(TEXT("PawnRef is not valid. - Check if it implements the required interfaces"));
+			}
 #endif		
+		}
 	}
 }
 
