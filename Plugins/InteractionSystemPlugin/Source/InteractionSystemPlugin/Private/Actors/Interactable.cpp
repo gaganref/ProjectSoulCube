@@ -3,6 +3,8 @@
 
 #include "Actors/Interactable.h"
 
+#include "Misc/InteractionStructs.h"
+
 
 // Sets default values
 AInteractable::AInteractable()
@@ -24,21 +26,28 @@ void AInteractable::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+FName AInteractable::GetItemId_Implementation()
+{
+	return ItemInfo.RowName;
+}
+
 void AInteractable::OnInteract_Implementation(AActor* Caller)
 {
 	IInteractableInterface::OnInteract_Implementation(Caller);
+
+	Destroy();
 }
 
 void AInteractable::BeginFocus_Implementation(AActor* Caller)
 {
 	IInteractableInterface::BeginFocus_Implementation(Caller);
 
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Green, FString::Printf(TEXT("%s Debug- Begin Focus."), *Name.ToString()));
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Green, FString::Printf(TEXT("%s Debug- Begin Focus."), *GetItemId_Implementation().ToString()));
 }
 
 void AInteractable::EndFocus_Implementation(AActor* Caller)
 {
 	IInteractableInterface::EndFocus_Implementation(Caller);
 
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString::Printf(TEXT("%s Debug- End Focus."), *Name.ToString()));
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString::Printf(TEXT("%s Debug- End Focus."), *GetItemId_Implementation().ToString()));
 }

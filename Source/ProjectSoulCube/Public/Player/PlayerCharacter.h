@@ -6,10 +6,13 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "Interface/CubeControllerInterface.h"
+#include "Interface/InventoryInterface.h"
 #include "PlayerCharacter.generated.h"
 
+class UInputAction;
+
 UCLASS()
-class PROJECTSOULCUBE_API APlayerCharacter : public ACharacter, public ICubeControllerInterface, public IAbilitySystemInterface
+class PROJECTSOULCUBE_API APlayerCharacter : public ACharacter, public ICubeControllerInterface, public IAbilitySystemInterface, public IInventoryInterface
 {
 	GENERATED_BODY()
 
@@ -22,6 +25,8 @@ protected:
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 public:
 	
@@ -63,12 +68,23 @@ private:
 	UPROPERTY(Category = "Controller", VisibleDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class ACubeController> PlayerControllerRef;
 
+	/** Ref to the input action move */
+	UPROPERTY(Category = "Input", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UInputAction> InputActionItemPickUp;
+
+	/** Ref to the input action look */
+	UPROPERTY(Category = "Input", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UInputAction> InputActionItemUse;
+
 
 protected:
 
 	UPROPERTY(Category = "Ability System", EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UInteractionDetectionComponent> InteractionDetectionComponent;
 
+	UPROPERTY(Category = "Ability System", EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UInventorySystemComponent> InventorySystemComponent;
+	
 	/** Ability System Component. Required to use Gameplay Attributes and Gameplay Abilities. */
 	UPROPERTY(Category = "Ability System", EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<class USCAbilitySystemComponent> AbilitySystemComponent;
@@ -118,6 +134,12 @@ protected:
 protected:
 	
 	virtual void PossessedBy(AController* NewController) override;
+
+	// Called to handle input for Item Pickup 
+	void HandleItemPickup(const FInputActionValue& ActionValue);
+
+	// Called to handle input for Item Usage 
+	void HandleItemUse(const FInputActionValue& ActionValue);
 	
 public:
 
@@ -126,8 +148,11 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	//~ End IAbilitySystemInterface
 
-public:
-	
+	//~ Begin IAbilitySystemInterface
+	/** Returns our Ability System Component. */
+	virtual UInventorySystemComponent* GetInventorySystemComponent_Implementation() override;
+	//~ End IAbilitySystemInterface
+
 	UFUNCTION(BlueprintCallable, Category = "Character|Attributes")
 	float GetHealth() const;
 

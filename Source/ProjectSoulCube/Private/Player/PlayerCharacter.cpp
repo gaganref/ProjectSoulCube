@@ -5,11 +5,13 @@
 
 #include "Components/CapsuleComponent.h"
 #include "DebugLibraryCommon.h"
+#include "EnhancedInputComponent.h"
 #include "Camera/FollowCameraActor.h"
 #include "Controller/CubeController.h"
 #include "InputActionValue.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InteractionDetectionComponent.h"
+#include "Components/InventorySystemComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GAS/SCAbilitySystemComponent.h"
 #include "GAS/Abilities/SCGameplayAbility.h"
@@ -34,6 +36,7 @@ APlayerCharacter::APlayerCharacter()
 	Camera->SetupAttachment(CameraBoom);
 
 	InteractionDetectionComponent = CreateDefaultSubobject<UInteractionDetectionComponent>(TEXT("Interaction Detection Component"));
+	InventorySystemComponent = CreateDefaultSubobject<UInventorySystemComponent>(TEXT("Inventory Sysytem Component"));
 	
 	AbilitySystemComponent = CreateDefaultSubobject<USCAbilitySystemComponent>(TEXT("Ability System Component"));
 	HealthAttributeSet = CreateDefaultSubobject<USCHealthAttributeSet>(TEXT("Health Attribute Set"));
@@ -63,6 +66,18 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 }
 
+void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	const TObjectPtr<UEnhancedInputComponent> EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+
+	if(EnhancedInputComponent)
+	{
+		EnhancedInputComponent->BindAction(InputActionItemPickUp, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleItemPickup);
+		EnhancedInputComponent->BindAction(InputActionItemUse, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleItemUse);
+	}
+}
 
 void APlayerCharacter::InitializeCustomCamera()
 {
@@ -138,6 +153,16 @@ void APlayerCharacter::HandleInputLook_Implementation(const FInputActionValue& A
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void APlayerCharacter::HandleItemPickup(const FInputActionValue& ActionValue)
+{
+	InteractionDetectionComponent->OnItemPickupButtonPressed(ActionValue);
+}
+
+void APlayerCharacter::HandleItemUse(const FInputActionValue& ActionValue)
+{
+	InteractionDetectionComponent->OnItemUseButtonPressed(ActionValue);
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -270,4 +295,9 @@ void APlayerCharacter::SetHealth(float Health)
 	{
 		HealthAttributeSet->SetHealth(Health);
 	}
+}
+
+UInventorySystemComponent* APlayerCharacter::GetInventorySystemComponent_Implementation()
+{
+	return InventorySystemComponent;
 }

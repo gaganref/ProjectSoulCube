@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "GameFramework/Actor.h"
 #include "Interface/InteractableInterface.h"
 #include "Interactable.generated.h"
@@ -13,8 +14,8 @@ class INTERACTIONSYSTEMPLUGIN_API AInteractable : public AActor, public IInterac
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
-	FText Name;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (RowType="/Script/InteractionSystemPlugin.InventoryItemInfo", AllowPrivateAccess = "true"))
+	FDataTableRowHandle ItemInfo;
 	
 public:
 	// Sets default values for this actor's properties
@@ -29,14 +30,18 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
+	virtual FName GetItemId_Implementation() override;
+	
 	virtual void OnInteract_Implementation(AActor* Caller) override;
 	
 	virtual void BeginFocus_Implementation(AActor* Caller) override;
 	
 	virtual void EndFocus_Implementation(AActor* Caller) override;
 
-
 public:
+	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
+	FName GetItemId();
+	
 	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
 	void OnInteract(AActor* Caller);
 	
@@ -45,4 +50,5 @@ public:
 	
 	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
 	void EndFocus(AActor* Caller);
+	
 };

@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "InteractableInterface.generated.h"
 
+struct FDataTableRowHandle;
 // This class does not need to be modified.
 UINTERFACE()
 class UInteractableInterface : public UInterface
@@ -22,6 +23,9 @@ class INTERACTIONSYSTEMPLUGIN_API IInteractableInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
+	FName GetItemId();
+	
 	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
 	void OnInteract(AActor* Caller);
 	

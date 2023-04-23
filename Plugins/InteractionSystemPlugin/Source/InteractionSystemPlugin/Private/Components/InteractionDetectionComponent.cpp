@@ -3,9 +3,9 @@
 
 #include "Components/InteractionDetectionComponent.h"
 
-#include "Engine/Private/KismetTraceUtils.h"
+#include "Components/InventorySystemComponent.h"
 #include "Interface/InteractableInterface.h"
-#include "Kismet/KismetSystemLibrary.h"
+#include "Interface/InventoryInterface.h"
 
 
 // Sets default values for this component's properties
@@ -28,6 +28,11 @@ void UInteractionDetectionComponent::BeginPlay()
 	if(OwnerPawn)
 	{
 		OwnerController = OwnerPawn->GetController();
+
+		if(OwnerPawn->GetClass()->ImplementsInterface(UInventoryInterface::StaticClass()))
+		{
+			InventoryRef = IInventoryInterface::Execute_GetInventorySystemComponent(OwnerPawn);
+		}
 	}
 }
 
@@ -37,7 +42,10 @@ void UInteractionDetectionComponent::TickComponent(float DeltaTime, ELevelTick T
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	LookForInteractable();
+	if(!bIsInteractingWithFocusedActor)
+	{
+		LookForInteractable();	
+	}
 }
 
 void UInteractionDetectionComponent::LookForInteractable()
@@ -68,32 +76,14 @@ void UInteractionDetectionComponent::LookForInteractable()
 	if(bHit)
 	{
 		TObjectPtr<AActor> HitActor = HitResult.GetActor();
-
 		if(HitActor)
 		{
 			if(HitActor != FocusedActor)
 			{
-				if(FocusedActor)
-				{
-					if(FocusedActor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
-					{
-						IInteractableInterface::Execute_EndFocus(FocusedActor, OwnerPawn);
-						FocusedActor = nullptr;
-					}
-				}
-
-				if(HitActor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
-				{
-					IInteractableInterface::Execute_BeginFocus(HitActor, OwnerPawn);
-					FocusedActor = HitActor;
-				}
-				else
-				{
-					FocusedActor = nullptr;
-				}
+				EndFocusOnActor(FocusedActor);
+				FocusedActor = BeginFocusOnActor(HitActor);
 			}
 		}
-		
 	}
 	
 	DrawDebugShape(World, bHit, StartPoint, EndPoint, HitResult);
@@ -126,6 +116,68 @@ void UInteractionDetectionComponent::DrawDebugShape(const UWorld* World, const b
 	{
 		DrawDebugSolidBox(World, HitResult.ImpactPoint, FVector(3, 3, 3), HitPointColor, false, LifeTime);
 	}
+}
+
+AActor* UInteractionDetectionComponent::BeginFocusOnActor(AActor* Actor)
+{
+	if(Actor)
+	{
+		if(Actor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
+		{
+			IInteractableInterface::Execute_BeginFocus(Actor, OwnerPawn);
+			return Actor;
+		}
+	}
+
+	return nullptr;
+}
+
+void UInteractionDetectionComponent::EndFocusOnActor(AActor* Actor)
+{
+	if(Actor)
+	{
+		if(Actor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
+		{
+			IInteractableInterface::Execute_EndFocus(Actor, OwnerPawn);
+		}
+	}
+}
+
+void UInteractionDetectionComponent::OnItemUseButtonPressed(const FInputActionValue& ActionValue)
+{
+	if(bIsInteractingWithFocusedActor)
+	{
+		return;
+	}
+	if(!FocusedActor)
+	{
+		return;
+	}
 	
+	bIsInteractingWithFocusedActor = true;
+
+	// TODO: apply its gameplay effect
+	UE_LOG(LogTemp, Warning, TEXT("Item Use Pressed"));
+	InventoryRef->FetchItemDataFromTable(FocusedActor);
+	bIsInteractingWithFocusedActor = false;
+}
+
+void UInteractionDetectionComponent::OnItemPickupButtonPressed(const FInputActionValue& ActionValue)
+{
+	if(bIsInteractingWithFocusedActor)
+	{
+		return;
+	}
+	if(!FocusedActor)
+	{
+		return;
+	}
 	
+	bIsInteractingWithFocusedActor = true;
+
+	// TODO: Add item to inventory and clean up the object by changing its collision and physics values and visibility
+	UE_LOG(LogTemp, Warning, TEXT("Item Pickup Pressed %s"), *FocusedActor->GetClass()->GetName());
+	// InventoryRef->AddItem();
+	
+	bIsInteractingWithFocusedActor = false;
 }
