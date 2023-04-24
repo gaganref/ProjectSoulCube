@@ -7,6 +7,10 @@
 #include "Engine/DataTable.h"
 #include "InventorySystemComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAddItem, const FName, ItemRowId, const int32, ItemQuantity);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRemoveItem, const FName, ItemRowId, const int32, ItemQuantity);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryPressed, const bool, bShouldOpenInventory);
+
 class UDataTable;
 struct FInventoryItemInfo;
 class IInteractableInterface;
@@ -18,6 +22,7 @@ class INTERACTIONSYSTEMPLUGIN_API UInventorySystemComponent : public UActorCompo
 	GENERATED_BODY()
 
 private:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	int32 InventorySize;
 	
@@ -27,12 +32,27 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (RequiredAssetDataTags="RowStructure=/Script/InteractionSystemPlugin.InventoryItemInfo", AllowPrivateAccess = "true"))
 	UDataTable* InventoryInfoTable;
 	
-	UPROPERTY()
-	TArray<FInventoryItemInfo> Inventory;
+	// TMap<FInventoryItemInfo*, int32> Inventory;
 
+	UPROPERTY()
+	TMap<FName, int32> Inventory;
+
+	UPROPERTY()
+	TObjectPtr<APawn> OwnerPawn;
+
+	UPROPERTY()
+	bool bIsInventoryOpen = false;
+
+private:
+	FOnAddItem AddItemDelegate;
+	FOnRemoveItem RemoveItemDelegate;
+	FOnInventoryPressed InventoryPressedDelegate;
+	
 public:
 	// Sets default values for this component's properties
 	UInventorySystemComponent();
+
+	~UInventorySystemComponent();
 
 protected:
 	// Called when the game starts
@@ -42,11 +62,14 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-public:
+protected:
 	// Fetch all the inventory data from the datatable
-	UFUNCTION(BlueprintCallable)
-	void FetchInventoryTableData();
+	void FetchInventoryTableDataToInventoryMap();
+
+	// Get item info from data table.
+	FInventoryItemInfo* FetchItemDataFromTable(AActor* Actor) const;
 	
+public:
 	// Add the item into inventory Array.
 	UFUNCTION(BlueprintCallable)
 	void AddItem(AActor* Actor);
@@ -61,5 +84,23 @@ public:
 
 	// Get item info from data table.
 	UFUNCTION(BlueprintCallable)
-	void FetchItemDataFromTable(AActor* Actor);
+	bool FetchItemDataReferenceFromTable(AActor* Actor, FInventoryItemInfo& OutItemInfo) const;
+
+	UFUNCTION(BlueprintCallable)
+	const TMap<FName, int32>& GetInventory() const;
+
+	FInventoryItemInfo* GetInventoryItemInfo(const FName RowName) const;
+	
+	TArray<FInventoryItemInfo*> GetInventoryItemsInfo() const;
+
+	UFUNCTION()
+	void ToggleInventory();
+
+public:
+	FOnAddItem* GetAddItemDelegate() { return &AddItemDelegate; }
+
+	FOnRemoveItem* GetRemoveItemDelegate() { return &RemoveItemDelegate; }
+	
+	FOnInventoryPressed* GetInventoryPressedDelegate() { return &InventoryPressedDelegate; }
+
 };

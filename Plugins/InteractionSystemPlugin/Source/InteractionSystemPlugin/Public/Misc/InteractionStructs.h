@@ -23,10 +23,7 @@ struct FInventoryItemInfo : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 ItemSize;
 	
-	UPROPERTY(BlueprintReadWrite)
-	int32 ItemQuantity;
-
-	FInventoryItemInfo() : ItemName("Default"), Thumbnail(nullptr), ItemClass(nullptr), ItemSize(0), ItemQuantity(0)
+	FInventoryItemInfo() : ItemName("Default"), Thumbnail(nullptr), ItemClass(nullptr), ItemSize(0)
 	{
 	}
 };

@@ -9,7 +9,7 @@
 class UInventorySystemComponent;
 // This class does not need to be modified.
 UINTERFACE()
-class UInventoryInterface : public UInterface
+class INTERACTIONSYSTEMPLUGIN_API UInventoryInterface : public UInterface
 {
 	GENERATED_BODY()
 };

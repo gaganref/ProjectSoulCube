@@ -21,7 +21,13 @@ private:
 	
 protected:
 	virtual void NativePreConstruct() override;
-
+	
+	virtual void OnInit_Implementation(AController* Controller);
+	
+public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void OnInit(AController* Controller);
+	
 public:
 	// Getters
 	

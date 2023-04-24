@@ -10,6 +10,10 @@ void UScCuwPawnStats::NativePreConstruct()
 	
 }
 
+void UScCuwPawnStats::OnInit_Implementation(AController* Controller)
+{
+}
+
 UScCuwProgressBarWithLabel* UScCuwPawnStats::GetHealthBar() const
 {
 	return HealthBar;

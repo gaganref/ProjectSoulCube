@@ -34,8 +34,8 @@ FName AInteractable::GetItemId_Implementation()
 void AInteractable::OnInteract_Implementation(AActor* Caller)
 {
 	IInteractableInterface::OnInteract_Implementation(Caller);
-
-	Destroy();
+	
+	// TODO: apply its gameplay effect
 }
 
 void AInteractable::BeginFocus_Implementation(AActor* Caller)

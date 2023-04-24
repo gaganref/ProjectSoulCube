@@ -17,16 +17,21 @@ UInventorySystemComponent::UInventorySystemComponent()
 	// ...
 }
 
+UInventorySystemComponent::~UInventorySystemComponent()
+{
+	// Inventory.Empty();
+}
 
 // Called when the game starts
 void UInventorySystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	OwnerPawn = Cast<APawn>(GetOwner());
 	
+	// ...
+	FetchInventoryTableDataToInventoryMap();
 }
-
 
 // Called every frame
 void UInventorySystemComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -35,20 +40,34 @@ void UInventorySystemComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	for(auto It : Inventory)
+	{
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Blue, FString::Printf(TEXT("Item - %s :: Quamtity - %s."), *It.Key.ToString(), *FString::FromInt(It.Value)));
+	}
 }
 
 void UInventorySystemComponent::AddItem(AActor* Actor)
 {
-	if(!Actor)
+	if(!CanAddItem(Actor) || !OwnerPawn)
 	{
 		return;
 	}
 	
-	if(!Actor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
+	FName RowName = IInteractableInterface::Execute_GetItemId(Actor);
+	FInventoryItemInfo* Item = FetchItemDataFromTable(Actor);
+	if(!Item)
 	{
 		return;
 	}
-		
+
+	const int NewItemQuantity = Inventory.FindRef(RowName) + 1;
+	Inventory.Add(RowName, NewItemQuantity);
+
+	if(AddItemDelegate.IsBound())
+	{
+		AddItemDelegate.Broadcast(RowName, NewItemQuantity);
+	}
+	Actor->Destroy();
 }
 
 void UInventorySystemComponent::RemoveItem(AActor* Actor)
@@ -61,43 +80,96 @@ bool UInventorySystemComponent::CanAddItem(AActor* Actor)
 	{
 		return false;
 	}
+	
 	if(!Actor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
 	{
 		return false;
 	}
-	if(InventorySize >= MaxInventorySize)
+	
+	FInventoryItemInfo* Item = FetchItemDataFromTable(Actor);
+	if(!Item)
 	{
 		return false;
 	}
-
-	// for(const auto& Item : Inventory)
-	// {
-	// 	if
-	// }
 	
-	return false;
+	if(Item->ItemSize + InventorySize > MaxInventorySize)
+	{
+		return false;
+	}
+	
+	return true;
 }
 
-void UInventorySystemComponent::FetchInventoryTableData()
+void UInventorySystemComponent::FetchInventoryTableDataToInventoryMap()
 {
+	if(!InventoryInfoTable)
+	{
+		return;
+	}
+
+	for(auto Item : InventoryInfoTable->GetRowNames())
+	{
+		Inventory.Add(Item, 0);
+	}
 }
 
-void UInventorySystemComponent::FetchItemDataFromTable(AActor* Actor)
+FInventoryItemInfo* UInventorySystemComponent::FetchItemDataFromTable(AActor* Actor) const
 {
 	if(!Actor)
 	{
-		return;
+		return nullptr;
 	}
 	
 	if(!Actor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
 	{
-		return;
+		return nullptr;
 	}
 
+	if(!InventoryInfoTable)
+	{
+		return nullptr;
+	}
+	
 	FName RowName = IInteractableInterface::Execute_GetItemId(Actor);
-	// auto Test = InventoryInfoTable->GetRowMap().Find(RowName);
-	FInventoryItemInfo* Item = InventoryInfoTable->FindRow<FInventoryItemInfo>(RowName, TEXT("FetchItemDataFromTable"));
+	FInventoryItemInfo* Item = GetInventoryItemInfo(RowName);
+	return Item;
+}
 
-	FString Output = Item->ItemName.ToString();
-	GLog->Log(Output);
+bool UInventorySystemComponent::FetchItemDataReferenceFromTable(AActor* Actor, FInventoryItemInfo& OutItemInfo) const
+{
+	FInventoryItemInfo* Item = FetchItemDataFromTable(Actor);
+	if(!Item)
+	{
+		return false;
+	}
+
+	OutItemInfo = *Item;
+	return true;
+}
+
+const TMap<FName, int32>& UInventorySystemComponent::GetInventory() const
+{
+	return Inventory;
+}
+
+FInventoryItemInfo* UInventorySystemComponent::GetInventoryItemInfo(const FName RowName) const
+{
+	return InventoryInfoTable->FindRow<FInventoryItemInfo>(RowName, TEXT("GetInventoryItemInfo in InventorySt=ystemComponent"));
+}
+
+TArray<FInventoryItemInfo*> UInventorySystemComponent::GetInventoryItemsInfo() const
+{
+	TArray<FInventoryItemInfo*> OutArray;
+	InventoryInfoTable->GetAllRows(TEXT("FetchInventoryTableDataToInventoryMap in InventorySt=ystemComponent"), OutArray);
+
+	return OutArray;
+}
+
+void UInventorySystemComponent::ToggleInventory()
+{
+	bIsInventoryOpen = !bIsInventoryOpen;
+	if(InventoryPressedDelegate.IsBound())
+	{
+		InventoryPressedDelegate.Broadcast(bIsInventoryOpen);
+	}
 }

@@ -68,14 +68,15 @@ private:
 	UPROPERTY(Category = "Controller", VisibleDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class ACubeController> PlayerControllerRef;
 
-	/** Ref to the input action move */
 	UPROPERTY(Category = "Input", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UInputAction> InputActionItemPickUp;
 
-	/** Ref to the input action look */
 	UPROPERTY(Category = "Input", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UInputAction> InputActionItemUse;
 
+	UPROPERTY(Category = "Input", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UInputAction> InputActionInventory;
+	
 
 protected:
 
@@ -140,6 +141,9 @@ protected:
 
 	// Called to handle input for Item Usage 
 	void HandleItemUse(const FInputActionValue& ActionValue);
+
+	// Called to handle Inventory
+	void HandleInventory(const FInputActionValue& ActionValue);
 	
 public:
 

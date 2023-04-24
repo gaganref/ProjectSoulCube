@@ -26,5 +26,8 @@ public:
 	
 	UFUNCTION(BlueprintGetter)
 	class UImage* GetImage() const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetImageTexture(UTexture* InTexture) const;
 	
 };

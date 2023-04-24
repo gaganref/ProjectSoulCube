@@ -156,9 +156,7 @@ void UInteractionDetectionComponent::OnItemUseButtonPressed(const FInputActionVa
 	
 	bIsInteractingWithFocusedActor = true;
 
-	// TODO: apply its gameplay effect
 	UE_LOG(LogTemp, Warning, TEXT("Item Use Pressed"));
-	InventoryRef->FetchItemDataFromTable(FocusedActor);
 	bIsInteractingWithFocusedActor = false;
 }
 
@@ -175,9 +173,8 @@ void UInteractionDetectionComponent::OnItemPickupButtonPressed(const FInputActio
 	
 	bIsInteractingWithFocusedActor = true;
 
-	// TODO: Add item to inventory and clean up the object by changing its collision and physics values and visibility
 	UE_LOG(LogTemp, Warning, TEXT("Item Pickup Pressed %s"), *FocusedActor->GetClass()->GetName());
-	// InventoryRef->AddItem();
 	
+	InventoryRef->AddItem(FocusedActor);
 	bIsInteractingWithFocusedActor = false;
 }

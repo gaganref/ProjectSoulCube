@@ -29,6 +29,19 @@ private:
 protected:
 	virtual void NativePreConstruct() override;
 	
+	virtual void NativeConstruct() override;
+	
+	virtual void OnInit_Implementation(AController* Controller);
+
+	virtual void OnItemButtonPressed_Implementation();
+	
+public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void OnInit(AController* Controller);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void OnItemButtonPressed();
+	
 public:
 	// Getters
 	

@@ -55,6 +55,7 @@ private:
 	UPROPERTY(Category = "Input", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UInputAction> InputActionLook;
 
+
 protected:
 
 	// Called to handle movement input
@@ -62,5 +63,4 @@ protected:
 
 	// Called to handle look input 
 	void HandleLook(const FInputActionValue& ActionValue);
-
 };

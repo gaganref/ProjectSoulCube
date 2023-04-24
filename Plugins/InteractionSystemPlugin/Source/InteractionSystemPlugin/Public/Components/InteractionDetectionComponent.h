@@ -62,6 +62,7 @@ protected:
 	virtual AActor* BeginFocusOnActor(AActor* Actor);
 
 	virtual void EndFocusOnActor(AActor* Actor);
+	
 public:
 	UFUNCTION()
 	void OnItemUseButtonPressed(const FInputActionValue& ActionValue);

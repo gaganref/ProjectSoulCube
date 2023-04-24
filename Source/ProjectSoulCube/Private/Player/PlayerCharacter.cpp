@@ -76,6 +76,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	{
 		EnhancedInputComponent->BindAction(InputActionItemPickUp, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleItemPickup);
 		EnhancedInputComponent->BindAction(InputActionItemUse, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleItemUse);
+		EnhancedInputComponent->BindAction(InputActionInventory, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleInventory);
 	}
 }
 
@@ -163,6 +164,11 @@ void APlayerCharacter::HandleItemPickup(const FInputActionValue& ActionValue)
 void APlayerCharacter::HandleItemUse(const FInputActionValue& ActionValue)
 {
 	InteractionDetectionComponent->OnItemUseButtonPressed(ActionValue);
+}
+
+void APlayerCharacter::HandleInventory(const FInputActionValue& ActionValue)
+{
+	InventorySystemComponent->ToggleInventory();
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)

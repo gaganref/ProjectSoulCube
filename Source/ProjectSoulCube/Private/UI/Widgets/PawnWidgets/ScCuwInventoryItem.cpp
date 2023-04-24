@@ -4,13 +4,35 @@
 #include "UI/Widgets/PawnWidgets/ScCuwInventoryItem.h"
 
 #include "CommonNumericTextBlock.h"
-#include "UI/Interface/InventoryItemDataInterface.h"
+#include "UI/Widgets/Buttons/ScCuwImageButton.h"
 
 void UScCuwInventoryItem::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 
 	SetItemQuantity(ItemQuantity);
+}
+
+void UScCuwInventoryItem::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	if(ItemButton)
+	{
+		if(ItemButton->GetButtonPressedDelegate())
+		{
+			ItemButton->GetButtonPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryItem::OnItemButtonPressed);
+		}
+	}
+}
+
+void UScCuwInventoryItem::OnInit_Implementation(AController* Controller)
+{
+}
+
+void UScCuwInventoryItem::OnItemButtonPressed_Implementation()
+{
+	UE_LOG(LogTemp, Error, TEXT("Item Button Pressed in Inventotry - %s"), *GetNameSafe(this));
 }
 
 int32 UScCuwInventoryItem::GetItemQuantity() const
