@@ -45,10 +45,10 @@ APlayerCharacter::APlayerCharacter()
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(40.f, 77.0f);
 	
-	// Don't rotate when the controller rotates. Let that just affect the camera. Except Yaw and Roll
+	// Don't rotate when the controller rotates. Let that just affect the camera. Except Yaw
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
-	bUseControllerRotationRoll = true;
+	bUseControllerRotationRoll = false;
 }
 
 // Called when the game starts or when spawned

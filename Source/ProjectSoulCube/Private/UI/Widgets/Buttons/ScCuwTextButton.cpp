@@ -17,7 +17,7 @@ FText UScCuwTextButton::GetText() const
 	return Text;
 }
 
-UCommonTextBlock* UScCuwTextButton::GetTextBlock() const
+UTextBlock* UScCuwTextButton::GetTextBlock() const
 {
 	return TextBlock;
 }

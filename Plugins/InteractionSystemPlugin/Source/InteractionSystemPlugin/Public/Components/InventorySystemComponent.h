@@ -68,6 +68,8 @@ protected:
 
 	// Get item info from data table.
 	FInventoryItemInfo* FetchItemDataFromTable(AActor* Actor) const;
+
+	FVector CalculateItemDropLocation() const;
 	
 public:
 	// Add the item into inventory Array.
@@ -77,6 +79,17 @@ public:
 	// Removes the item from the inventory array using the item.
 	UFUNCTION(BlueprintCallable)
 	void RemoveItem(AActor* Actor);
+
+	UFUNCTION(BlueprintCallable)
+	bool RemoveItemByItemRowName(FName ItemRow);
+	
+	// Removes the item from the inventory array using the item.
+	UFUNCTION(BlueprintCallable)
+	void UseInventoryItem(FName ItemRow);
+
+	// Removes the item from the inventory array using the item.
+	UFUNCTION(BlueprintCallable)
+	void DropInventoryItem(FName ItemRow);
 
 	// Add the item into inventory Array.
 	UFUNCTION(BlueprintCallable)

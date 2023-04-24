@@ -5,6 +5,8 @@
 
 #include "Interface/InteractableInterface.h"
 #include "..\..\Public\Misc\InteractionStructs.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 // Sets default values for this component's properties
@@ -72,6 +74,65 @@ void UInventorySystemComponent::AddItem(AActor* Actor)
 
 void UInventorySystemComponent::RemoveItem(AActor* Actor)
 {
+	
+}
+
+bool UInventorySystemComponent::RemoveItemByItemRowName(FName ItemRow)
+{
+	FInventoryItemInfo* Item = GetInventoryItemInfo(ItemRow);
+	if(!Item)
+	{
+		return false;
+	}
+	
+	const int NewItemQuantity = Inventory.FindRef(ItemRow) - 1;
+	if(NewItemQuantity < 0)
+	{
+		return false;
+	}
+	
+	Inventory.Add(ItemRow, NewItemQuantity);
+
+	if(RemoveItemDelegate.IsBound())
+	{
+		RemoveItemDelegate.Broadcast(ItemRow, NewItemQuantity);
+	}
+
+	return true;
+}
+
+void UInventorySystemComponent::UseInventoryItem(FName ItemRow)
+{
+	if(RemoveItemByItemRowName(ItemRow))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("placeHolder for Use Item"));
+	}
+}
+
+void UInventorySystemComponent::DropInventoryItem(FName ItemRow)
+{
+	if(!OwnerPawn || !GetWorld())
+	{
+		return;
+	}
+
+	FInventoryItemInfo* Item = GetInventoryItemInfo(ItemRow);
+	if(!Item)
+	{
+		return;	
+	}
+	
+	if(RemoveItemByItemRowName(ItemRow))
+	{
+		FRotator ItemSpawnRotation;
+		FVector ItemSpawnLocation = CalculateItemDropLocation();
+		ItemSpawnLocation = ItemSpawnRotation.RotateVector(ItemSpawnLocation);
+		
+		FActorSpawnParameters ItemSpawnParams;
+		ItemSpawnParams.Instigator = OwnerPawn;
+		ItemSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		GetWorld()->SpawnActor(Item->ItemClass, &ItemSpawnLocation, &ItemSpawnRotation, ItemSpawnParams);
+	}
 }
 
 bool UInventorySystemComponent::CanAddItem(AActor* Actor)
@@ -133,6 +194,28 @@ FInventoryItemInfo* UInventorySystemComponent::FetchItemDataFromTable(AActor* Ac
 	FName RowName = IInteractableInterface::Execute_GetItemId(Actor);
 	FInventoryItemInfo* Item = GetInventoryItemInfo(RowName);
 	return Item;
+}
+
+FVector UInventorySystemComponent::CalculateItemDropLocation() const
+{
+	FVector OutLocation;
+	if(!OwnerPawn || !GetWorld())
+	{
+		return OutLocation;
+	}
+
+	const FVector PawnLocation = OwnerPawn->GetActorLocation();
+	const FVector PawnForwardVector = OwnerPawn->GetActorForwardVector();
+
+	FVector LineTraceStartLocation = FMath::VRandCone(PawnForwardVector, FMath::DegreesToRadians(30.0f));
+	LineTraceStartLocation *= 500.0f;
+	LineTraceStartLocation += PawnLocation;
+	FVector LineTraceEndLocation = LineTraceStartLocation - FVector(0.0f, 0.0f, 500.0f);
+	FCollisionQueryParams TraceParams;
+	FHitResult HitResult;
+	GetWorld()->LineTraceSingleByChannel(HitResult, LineTraceStartLocation, LineTraceEndLocation, ECC_Visibility, TraceParams);
+
+	return HitResult.Location;
 }
 
 bool UInventorySystemComponent::FetchItemDataReferenceFromTable(AActor* Actor, FInventoryItemInfo& OutItemInfo) const

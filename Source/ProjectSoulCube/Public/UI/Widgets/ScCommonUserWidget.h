@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class PROJECTSOULCUBE_API UScCommonUserWidget : public UCommonUserWidget
+class PROJECTSOULCUBE_API UScCommonUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
 

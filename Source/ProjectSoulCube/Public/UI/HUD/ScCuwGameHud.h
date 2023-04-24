@@ -10,7 +10,7 @@
  * 
  */
 UCLASS(Abstract, Blueprintable)
-class PROJECTSOULCUBE_API UScCuwGameHud : public UCommonUserWidget
+class PROJECTSOULCUBE_API UScCuwGameHud : public UUserWidget
 {
 	GENERATED_BODY()
 

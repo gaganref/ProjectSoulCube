@@ -27,6 +27,9 @@ private:
 	UPROPERTY(BlueprintGetter = GetWrapBox, meta = (BindWidget))
 	TObjectPtr<class UWrapBox> WrapBox;
 
+	UPROPERTY(BlueprintGetter = GetInventoryItemStats, meta = (BindWidget))
+	TObjectPtr<class UScCuwInventoryItemStats> InventoryItemStats;
+	
 private:
 	UPROPERTY(BlueprintGetter = GetPlayerPawn, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<APawn> PlayerPawn;
@@ -39,6 +42,8 @@ private:
 	
 protected:
 	virtual void NativePreConstruct() override;
+
+	virtual void NativeConstruct() override;
 	
 	virtual void OnInit_Implementation(AController* Controller);
 
@@ -52,7 +57,19 @@ protected:
 	void HandleToggleInventory(const bool bShouldOpenInventory);
 
 	UFUNCTION()
+	void HandleInventoryItemButtonClicked(UScCuwInventoryItem* ItemReference);
+
+	UFUNCTION()
 	static void SetInventoryItemVisibility(UScCuwInventoryItem* ItemWidget, const int32 ItemQuantity);
+
+	UFUNCTION()
+	void HandleItemUseButtonPressed(UScCuwInventoryItem* ItemReference);
+
+	UFUNCTION()
+	void HandleItemDropButtonPressed(UScCuwInventoryItem* ItemReference);
+
+	UFUNCTION()
+	void HandleItemCancelButtonPressed(UScCuwInventoryItem* ItemReference);
 	
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -67,6 +84,9 @@ public:
 	UFUNCTION(BlueprintGetter)
 	class UWrapBox* GetWrapBox() const;
 
+	UFUNCTION(BlueprintGetter)
+	class UScCuwInventoryItemStats* GetInventoryItemStats() const;
+	
 	UFUNCTION(BlueprintGetter)
 	class APawn* GetPlayerPawn() const;
 

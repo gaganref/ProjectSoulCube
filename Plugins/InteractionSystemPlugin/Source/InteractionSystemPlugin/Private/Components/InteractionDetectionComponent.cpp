@@ -85,6 +85,11 @@ void UInteractionDetectionComponent::LookForInteractable()
 			}
 		}
 	}
+	else
+	{
+		EndFocusOnActor(FocusedActor);
+		FocusedActor = nullptr;
+	}
 	
 	DrawDebugShape(World, bHit, StartPoint, EndPoint, HitResult);
 }

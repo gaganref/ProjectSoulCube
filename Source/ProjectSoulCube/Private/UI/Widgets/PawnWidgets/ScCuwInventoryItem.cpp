@@ -32,7 +32,10 @@ void UScCuwInventoryItem::OnInit_Implementation(AController* Controller)
 
 void UScCuwInventoryItem::OnItemButtonPressed_Implementation()
 {
-	UE_LOG(LogTemp, Error, TEXT("Item Button Pressed in Inventotry - %s"), *GetNameSafe(this));
+	if(InventoryItemClickedDelegate.IsBound())
+	{
+		InventoryItemClickedDelegate.Broadcast(this);
+	}
 }
 
 int32 UScCuwInventoryItem::GetItemQuantity() const
@@ -45,9 +48,14 @@ UScCuwImageButton* UScCuwInventoryItem::GetItemButton() const
 	return ItemButton;
 }
 
-UCommonNumericTextBlock* UScCuwInventoryItem::GetItemQuantityBlock() const
+UTextBlock* UScCuwInventoryItem::GetItemQuantityBlock() const
 {
 	return ItemQuantityBlock;
+}
+
+FName UScCuwInventoryItem::GetItemId() const
+{
+	return ItemId;
 }
 
 void UScCuwInventoryItem::SetItemQuantity(const int32 NewQuantity)
@@ -56,5 +64,18 @@ void UScCuwInventoryItem::SetItemQuantity(const int32 NewQuantity)
 	{
 		ItemQuantity = NewQuantity;
 		ItemQuantityBlock->SetText(FText::FromString(FString::FromInt(ItemQuantity)));
+	}
+}
+
+void UScCuwInventoryItem::SetItemId(const FName NewId)
+{
+	ItemId = NewId;
+}
+
+void UScCuwInventoryItem::SetItemTexture(UTexture* NewTexture) const
+{
+	if(ItemButton)
+	{
+		ItemButton->SetImageTexture(NewTexture);
 	}
 }

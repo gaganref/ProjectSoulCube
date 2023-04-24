@@ -22,7 +22,7 @@ UProgressBar* UScCuwProgressBarWithLabel::GetProgressBar() const
 	return ProgressBar;
 }
 
-UCommonTextBlock* UScCuwProgressBarWithLabel::GetTextBlock() const
+UTextBlock* UScCuwProgressBarWithLabel::GetTextBlock() const
 {
 	return TextBlock;
 }

@@ -7,12 +7,17 @@
 #include "Components/WrapBox.h"
 #include "Interface/InventoryInterface.h"
 #include "Misc/InteractionStructs.h"
-#include "UI/Widgets/Buttons/ScCuwImageButton.h"
+#include "UI/Widgets/DataWidgets/ScCuwInventoryItemStats.h"
 #include "UI/Widgets/PawnWidgets/ScCuwInventoryItem.h"
 
 void UScCuwInventoryWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
+}
+
+void UScCuwInventoryWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
 
 	SetVisibility(ESlateVisibility::Collapsed);
 }
@@ -46,7 +51,11 @@ void UScCuwInventoryWidget::OnInit_Implementation(AController* Controller)
 				InventoryItems.Add(Item.Key, ItemWidget);
 				
 				ItemWidget->SetItemQuantity(Item.Value);
-				ItemWidget->GetItemButton()->SetImageTexture(ItemInfo->Thumbnail);
+				ItemWidget->SetItemId(Item.Key);
+				ItemWidget->SetItemTexture(ItemInfo->Thumbnail);
+
+				ItemWidget->GetInventoryItemClickedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleInventoryItemButtonClicked);
+				
 				SetInventoryItemVisibility(ItemWidget, Item.Value);
 				
 				WrapBox->AddChild(ItemWidget);
@@ -56,6 +65,13 @@ void UScCuwInventoryWidget::OnInit_Implementation(AController* Controller)
 		InventoryRef->GetAddItemDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleInventoryItemAdd);
 		InventoryRef->GetRemoveItemDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleInventoryItemRemove);
 		InventoryRef->GetInventoryPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleToggleInventory);
+	}
+
+	if(InventoryItemStats)
+	{
+		InventoryItemStats->GetItemUseButtonPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleItemUseButtonPressed);
+		InventoryItemStats->GetItemDropButtonPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleItemDropButtonPressed);
+		InventoryItemStats->GetItemCancelButtonPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleItemCancelButtonPressed);
 	}
 }
 
@@ -85,6 +101,33 @@ void UScCuwInventoryWidget::HandleToggleInventory(const bool bShouldOpenInventor
 	{
 		SetVisibility(ESlateVisibility::Collapsed);
 	}
+
+	InventoryItemStats->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+void UScCuwInventoryWidget::HandleInventoryItemButtonClicked(UScCuwInventoryItem* ItemReference)
+{
+	if(!InventoryItemStats)
+	{
+		return;
+	}
+
+	if(!InventoryRef)
+	{
+		return;
+	}
+	
+	FInventoryItemInfo* ItemInfo = InventoryRef->GetInventoryItemInfo(ItemReference->GetItemId());
+	if(!ItemInfo)
+	{
+		return;
+	}
+	
+	InventoryItemStats->SetParentItemRef(ItemReference);
+	InventoryItemStats->SetItemName(ItemInfo->ItemName);
+	InventoryItemStats->SetItemQuantity(ItemReference->GetItemQuantity());
+	
+	InventoryItemStats->SetVisibility(ESlateVisibility::Visible);
 }
 
 void UScCuwInventoryWidget::SetInventoryItemVisibility(UScCuwInventoryItem* ItemWidget, const int32 ItemQuantity)
@@ -99,6 +142,41 @@ void UScCuwInventoryWidget::SetInventoryItemVisibility(UScCuwInventoryItem* Item
 	}
 }
 
+void UScCuwInventoryWidget::HandleItemUseButtonPressed(UScCuwInventoryItem* ItemReference)
+{
+	if(!InventoryRef)
+	{
+		return;
+	}
+
+	FName RowName = *InventoryItems.FindKey(ItemReference);
+	InventoryRef->UseInventoryItem(RowName);
+	
+	InventoryItemStats->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+void UScCuwInventoryWidget::HandleItemDropButtonPressed(UScCuwInventoryItem* ItemReference)
+{
+	if(!InventoryRef)
+	{
+		return;
+	}
+
+	FName RowName = *InventoryItems.FindKey(ItemReference);
+	InventoryRef->DropInventoryItem(RowName);
+	
+	InventoryItemStats->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+void UScCuwInventoryWidget::HandleItemCancelButtonPressed(UScCuwInventoryItem* ItemReference)
+{
+	if(!InventoryItemStats)
+	{
+		return;
+	}
+	InventoryItemStats->SetVisibility(ESlateVisibility::Collapsed);
+}
+
 UScrollBox* UScCuwInventoryWidget::GetScrollBox() const
 {
 	return ScrollBox;
@@ -107,6 +185,11 @@ UScrollBox* UScCuwInventoryWidget::GetScrollBox() const
 UWrapBox* UScCuwInventoryWidget::GetWrapBox() const
 {
 	return WrapBox;
+}
+
+UScCuwInventoryItemStats* UScCuwInventoryWidget::GetInventoryItemStats() const
+{
+	return InventoryItemStats;
 }
 
 TSubclassOf<UUserWidget> UScCuwInventoryWidget::GetInventoryItemClass() const

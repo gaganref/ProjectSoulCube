@@ -7,6 +7,8 @@
 #include "UI/Widgets/ScCommonUserWidget.h"
 #include "ScCuwInventoryItem.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryItemClicked, UScCuwInventoryItem*, ItemReference);
+
 /**
  * 
  */
@@ -16,15 +18,20 @@ class PROJECTSOULCUBE_API UScCuwInventoryItem : public UScCommonUserWidget
 	GENERATED_BODY()
 
 private:
-	UPROPERTY(EditAnywhere, BlueprintGetter = GetItemQuantity, BlueprintSetter = SetItemQuantity)
+	UPROPERTY(BlueprintGetter = GetItemQuantity, BlueprintSetter = SetItemQuantity)
 	int32 ItemQuantity;	
 
+	UPROPERTY(BlueprintGetter = GetItemId, BlueprintSetter = SetItemId)
+	FName ItemId;
+
+	FOnInventoryItemClicked InventoryItemClickedDelegate;
+	
 private:
 	UPROPERTY(BlueprintGetter = GetItemButton, meta = (BindWidget))
 	TObjectPtr<class UScCuwImageButton> ItemButton;
 
 	UPROPERTY(BlueprintGetter = GetItemQuantityBlock, meta = (BindWidget))
-	TObjectPtr<class UCommonNumericTextBlock> ItemQuantityBlock;
+	TObjectPtr<class UTextBlock> ItemQuantityBlock;
 
 protected:
 	virtual void NativePreConstruct() override;
@@ -52,11 +59,22 @@ public:
 	class UScCuwImageButton* GetItemButton() const;
 
 	UFUNCTION(BlueprintGetter)
-	class UCommonNumericTextBlock* GetItemQuantityBlock() const;
+	class UTextBlock* GetItemQuantityBlock() const;
 
+	UFUNCTION(BlueprintGetter)
+	FName GetItemId() const;
+	
 public:
 	// Setters
 
 	UFUNCTION(BlueprintSetter)
 	void SetItemQuantity(const int32 NewQuantity);
+
+	UFUNCTION(BlueprintSetter)
+	void SetItemId(const FName NewId);
+	
+	UFUNCTION(BlueprintCallable)
+	void SetItemTexture(UTexture* NewTexture) const;
+
+	FOnInventoryItemClicked* GetInventoryItemClickedDelegate() { return &InventoryItemClickedDelegate; }
 };

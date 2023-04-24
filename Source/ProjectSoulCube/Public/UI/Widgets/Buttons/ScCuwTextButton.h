@@ -20,7 +20,7 @@ private:
 
 private:	
 	UPROPERTY(BlueprintGetter = GetTextBlock, meta = (BindWidget))
-	TObjectPtr<class UCommonTextBlock> TextBlock;
+	TObjectPtr<class UTextBlock> TextBlock;
 	
 protected:
 	virtual void NativePreConstruct() override;
@@ -32,7 +32,7 @@ public:
 	FText GetText() const;
 
 	UFUNCTION(BlueprintGetter)
-	class UCommonTextBlock* GetTextBlock() const;
+	class UTextBlock* GetTextBlock() const;
 
 public:
 	// Setters

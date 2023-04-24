@@ -10,13 +10,17 @@
 void UScCuwButtonWidgetBase::NativePreConstruct()
 {
 	Super::NativePreConstruct();
+}
+
+void UScCuwButtonWidgetBase::NativeConstruct()
+{
+	Super::NativeConstruct();
 	
-	Button->OnClicked().AddUObject(this, &UScCuwButtonWidgetBase::OnButtonPressed);
+	Button->OnClicked.AddUniqueDynamic(this, &UScCuwButtonWidgetBase::OnButtonPressed);
 }
 
 void UScCuwButtonWidgetBase::OnButtonPressed_Implementation()
 {
-	UE_LOG(LogTemp, Error, TEXT("Reaches - %s"), *GetNameSafe(this));
 	if(ButtonPressedDelegate.IsBound())
 	{
 		ButtonPressedDelegate.Broadcast();
@@ -31,7 +35,7 @@ void UScCuwButtonWidgetBase::OnButtonUnHovered_Implementation()
 {
 }
 
-UScCbbButton* UScCuwButtonWidgetBase::GetButton() const
+UButton* UScCuwButtonWidgetBase::GetButton() const
 {
 	return Button;
 }

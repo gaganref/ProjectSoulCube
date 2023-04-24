@@ -21,12 +21,14 @@ class PROJECTSOULCUBE_API UScCuwButtonWidgetBase : public UScCommonUserWidget
 
 private:
 	UPROPERTY(BlueprintGetter = GetButton, meta = (BindWidget))
-	TObjectPtr<class UScCbbButton> Button;
+	TObjectPtr<class UButton> Button;
 
 	FOnButtonPressed ButtonPressedDelegate;
 
 protected:
 	virtual void NativePreConstruct() override;
+
+	virtual void NativeConstruct() override;
 
 	virtual void OnButtonPressed_Implementation();
 
@@ -38,7 +40,7 @@ public:
 	// Getters
 	
 	UFUNCTION(BlueprintGetter)
-	class UScCbbButton* GetButton() const;
+	class UButton* GetButton() const;
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnButtonPressed();
