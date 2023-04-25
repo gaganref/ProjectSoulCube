@@ -34,4 +34,7 @@ public:
 	
 	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
 	void EndFocus(AActor* Caller);
+	
+	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
+	bool CanInteract(AActor* Caller);
 };

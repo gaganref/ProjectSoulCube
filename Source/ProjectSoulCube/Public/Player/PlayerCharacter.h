@@ -9,6 +9,7 @@
 #include "Interface/InventoryInterface.h"
 #include "PlayerCharacter.generated.h"
 
+struct FOnAttributeChangeData;
 class UInputAction;
 
 UCLASS()
@@ -91,7 +92,7 @@ protected:
 	TObjectPtr<class USCAbilitySystemComponent> AbilitySystemComponent;
 	
 	UPROPERTY()
-	TObjectPtr<class USCHealthAttributeSet> HealthAttributeSet;
+	TObjectPtr<class UScPlayerAttributeSet> PlayerAttributeSet;
 
 	// Default attributes for a character for initializing on spawn/respawn.
 	// This is an instant GE that overrides the values for attributes that get reset on spawn/respawn.
@@ -106,6 +107,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability System")
 	TArray<TSubclassOf<class USCGameplayAbility>> CharacterAbilities;
 	
+protected:
+
+	FDelegateHandle HealthChangedDelegateHandle;
+
 	
 public:
 	
@@ -144,6 +149,8 @@ protected:
 
 	// Called to handle Inventory
 	void HandleInventory(const FInputActionValue& ActionValue);
+
+	virtual void HealthChanged(const FOnAttributeChangeData& Data);
 	
 public:
 
@@ -168,6 +175,18 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Character|Attributes")
 	virtual bool IsAlive() const;
+
+	UFUNCTION(BlueprintCallable, Category = "GASShooter|GSCharacter|Attributes")
+	float GetStamina() const;
+
+	UFUNCTION(BlueprintCallable, Category = "GASShooter|GSCharacter|Attributes")
+	float GetMaxStamina() const;
+
+	UFUNCTION(BlueprintCallable, Category = "GASShooter|GSCharacter|Attributes")
+	float GetShield() const;
+
+	UFUNCTION(BlueprintCallable, Category = "GASShooter|GSCharacter|Attributes")
+	float GetMaxShield() const;
 	
 public:
 
@@ -177,4 +196,9 @@ public:
 	*/
 
 	virtual void SetHealth(float Health);
+	
+	virtual void SetStamina(float Stamina);
+
+	virtual void SetShield(float Shield);
+    	
 };

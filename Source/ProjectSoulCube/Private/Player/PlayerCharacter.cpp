@@ -16,6 +16,7 @@
 #include "GAS/SCAbilitySystemComponent.h"
 #include "GAS/Abilities/SCGameplayAbility.h"
 #include "GAS/Abilities/AttributeSets/SCHealthAttributeSet.h"
+#include "GAS/Abilities/AttributeSets/ScPlayerAttributeSet.h"
 #include "GAS/GameplayEffects/SCGameplayEffect.h"
 #include "Player/SCPlayerState.h"
 #include "ProjectSoulCube/ProjectSoulCube.h"
@@ -39,7 +40,7 @@ APlayerCharacter::APlayerCharacter()
 	InventorySystemComponent = CreateDefaultSubobject<UInventorySystemComponent>(TEXT("Inventory Sysytem Component"));
 	
 	AbilitySystemComponent = CreateDefaultSubobject<USCAbilitySystemComponent>(TEXT("Ability System Component"));
-	HealthAttributeSet = CreateDefaultSubobject<USCHealthAttributeSet>(TEXT("Health Attribute Set"));
+	PlayerAttributeSet = CreateDefaultSubobject<UScPlayerAttributeSet>(TEXT("Player Attribute Set"));
 	
 	
 	// Set size for collision capsule
@@ -57,6 +58,12 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	InitializeCustomCamera();
+
+	if (AbilitySystemComponent)
+	{
+		// Attribute change callbacks
+		HealthChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PlayerAttributeSet->GetHealthAttribute()).AddUObject(this, &APlayerCharacter::HealthChanged);
+	}
 }
 
 // Called every frame
@@ -171,6 +178,19 @@ void APlayerCharacter::HandleInventory(const FInputActionValue& ActionValue)
 	InventorySystemComponent->ToggleInventory();
 }
 
+void APlayerCharacter::HealthChanged(const FOnAttributeChangeData& Data)
+{
+	if (IsAlive())
+	{
+		return;
+	}
+
+	// if(IsValid(this))
+	// {
+	// 	Destroy();	
+	// }
+}
+
 void APlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -178,15 +198,17 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
-
-		// Set Health to their max. This is only necessary for *Respawn*.
-		SetHealth(GetMaxHealth());
 		
 		InitializeAttributes();
 
 		AddStartupEffects();
 
 		AddCharacterAbilities();
+
+		// Set Health to their max. This is only necessary for *Respawn*.
+		SetHealth(GetMaxHealth());
+		SetShield(GetMaxShield());
+		SetStamina(GetMaxStamina());
 	}
 	
 	// ASC MixedMode replication requires that the ASC Owner's Owner be the Controller.
@@ -262,9 +284,9 @@ void APlayerCharacter::AddCharacterAbilities()
 
 float APlayerCharacter::GetHealth() const
 {
-	if(HealthAttributeSet)
+	if(PlayerAttributeSet)
 	{
-		return HealthAttributeSet->GetHealth();
+		return PlayerAttributeSet->GetHealth();
 	}
 
 	return 0.0f;
@@ -272,9 +294,9 @@ float APlayerCharacter::GetHealth() const
 
 float APlayerCharacter::GetMaxHealth() const
 {
-	if(HealthAttributeSet)
+	if(PlayerAttributeSet)
 	{
-		return HealthAttributeSet->GetMaxHealth();
+		return PlayerAttributeSet->GetMaxHealth();
 	}
 
 	return 0.0f;
@@ -282,9 +304,49 @@ float APlayerCharacter::GetMaxHealth() const
 
 float APlayerCharacter::GetHealthRegenRate() const
 {
-	if(HealthAttributeSet)
+	if(PlayerAttributeSet)
 	{
-		return HealthAttributeSet->GetHealthRegenRate();
+		return PlayerAttributeSet->GetHealthRegenRate();
+	}
+
+	return 0.0f;
+}
+
+float APlayerCharacter::GetStamina() const
+{
+	if (IsValid(PlayerAttributeSet))
+	{
+		return PlayerAttributeSet->GetStamina();
+	}
+
+	return 0.0f;
+}
+
+float APlayerCharacter::GetMaxStamina() const
+{
+	if (IsValid(PlayerAttributeSet))
+	{
+		return PlayerAttributeSet->GetMaxStamina();
+	}
+
+	return 0.0f;
+}
+
+float APlayerCharacter::GetShield() const
+{
+	if (IsValid(PlayerAttributeSet))
+	{
+		return PlayerAttributeSet->GetShield();
+	}
+
+	return 0.0f;
+}
+
+float APlayerCharacter::GetMaxShield() const
+{
+	if (IsValid(PlayerAttributeSet))
+	{
+		return PlayerAttributeSet->GetMaxShield();
 	}
 
 	return 0.0f;
@@ -297,9 +359,25 @@ bool APlayerCharacter::IsAlive() const
 
 void APlayerCharacter::SetHealth(float Health)
 {
-	if(HealthAttributeSet)
+	if(PlayerAttributeSet)
 	{
-		HealthAttributeSet->SetHealth(Health);
+		PlayerAttributeSet->SetHealth(Health);
+	}
+}
+
+void APlayerCharacter::SetStamina(float Stamina)
+{
+	if (IsValid(PlayerAttributeSet))
+	{
+		PlayerAttributeSet->SetStamina(Stamina);
+	}
+}
+
+void APlayerCharacter::SetShield(float Shield)
+{
+	if (IsValid(PlayerAttributeSet))
+	{
+		PlayerAttributeSet->SetShield(Shield);
 	}
 }
 

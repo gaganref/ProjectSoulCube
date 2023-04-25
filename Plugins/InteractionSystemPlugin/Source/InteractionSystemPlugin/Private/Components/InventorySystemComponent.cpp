@@ -65,6 +65,8 @@ void UInventorySystemComponent::AddItem(AActor* Actor)
 	const int NewItemQuantity = Inventory.FindRef(RowName) + 1;
 	Inventory.Add(RowName, NewItemQuantity);
 
+	InventorySize += Item->ItemWeight;
+	
 	if(AddItemDelegate.IsBound())
 	{
 		AddItemDelegate.Broadcast(RowName, NewItemQuantity);
@@ -103,6 +105,36 @@ bool UInventorySystemComponent::RemoveItemByItemRowName(FName ItemRow)
 
 void UInventorySystemComponent::UseInventoryItem(FName ItemRow)
 {
+	if(!OwnerPawn)
+	{
+		return;
+	}
+	
+	FInventoryItemInfo* Item = GetInventoryItemInfo(ItemRow);
+	if(!Item)
+	{
+		return;
+	}
+	if(!Item->ItemClass)
+	{
+		return;
+	}
+	
+	AActor* ItemActor = Item->ItemClass->GetDefaultObject<AActor>();
+	if(!ItemActor)
+	{
+		return;
+	}
+	if(!ItemActor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
+	{
+		return;
+	}
+	if(!IInteractableInterface::Execute_CanInteract(ItemActor, OwnerPawn))	// Stop use item if we cannot interact with the items
+	{
+		return;
+	}
+
+	IInteractableInterface::Execute_OnInteract(ItemActor, OwnerPawn);
 	if(RemoveItemByItemRowName(ItemRow))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("placeHolder for Use Item"));
@@ -153,7 +185,7 @@ bool UInventorySystemComponent::CanAddItem(AActor* Actor)
 		return false;
 	}
 	
-	if(Item->ItemSize + InventorySize > MaxInventorySize)
+	if(InventorySize + Item->ItemWeight > MaxInventorySize)
 	{
 		return false;
 	}
@@ -255,4 +287,24 @@ void UInventorySystemComponent::ToggleInventory()
 	{
 		InventoryPressedDelegate.Broadcast(bIsInventoryOpen);
 	}
+}
+
+int32 UInventorySystemComponent::GetInventorySize()
+{
+	return InventorySize;
+}
+
+int32 UInventorySystemComponent::GetMaxInventorySize()
+{
+	return MaxInventorySize;
+}
+
+void UInventorySystemComponent::SetInventorySize(const int32 InSize)
+{
+	InventorySize = InSize;
+}
+
+void UInventorySystemComponent::SetMaxInventorySize(const int32 InSize)
+{
+	MaxInventorySize = InSize;
 }

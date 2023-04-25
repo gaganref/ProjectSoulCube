@@ -23,11 +23,11 @@ class INTERACTIONSYSTEMPLUGIN_API UInventorySystemComponent : public UActorCompo
 
 private:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	int32 InventorySize;
+	UPROPERTY(BlueprintGetter = GetInventorySize, BlueprintSetter = SetInventorySize, meta = (AllowPrivateAccess = "true"))
+	int32 InventorySize = 0;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	int32 MaxInventorySize;
+	UPROPERTY(BlueprintGetter = GetMaxInventorySize, BlueprintSetter = SetMaxInventorySize, meta = (AllowPrivateAccess = "true"))
+	int32 MaxInventorySize = 20;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (RequiredAssetDataTags="RowStructure=/Script/InteractionSystemPlugin.InventoryItemInfo", AllowPrivateAccess = "true"))
 	UDataTable* InventoryInfoTable;
@@ -116,4 +116,20 @@ public:
 	
 	FOnInventoryPressed* GetInventoryPressedDelegate() { return &InventoryPressedDelegate; }
 
+public:
+
+	UFUNCTION(BlueprintGetter)
+	int32 GetInventorySize();
+
+	UFUNCTION(BlueprintGetter)
+	int32 GetMaxInventorySize();
+
+public:
+
+	UFUNCTION(BlueprintSetter)
+	void SetInventorySize(const int32 InSize);
+
+	UFUNCTION(BlueprintSetter)
+	void SetMaxInventorySize(const int32 InSize);
+	
 };

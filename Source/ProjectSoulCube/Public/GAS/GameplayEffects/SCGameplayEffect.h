@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract, Blueprintable)
 class PROJECTSOULCUBE_API USCGameplayEffect : public UGameplayEffect
 {
 	GENERATED_BODY()

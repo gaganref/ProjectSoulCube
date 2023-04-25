@@ -21,9 +21,9 @@ struct FInventoryItemInfo : public FTableRowBase
 	TSubclassOf<AActor> ItemClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 ItemSize;
+	int32 ItemWeight;
 	
-	FInventoryItemInfo() : ItemName("Default"), Thumbnail(nullptr), ItemClass(nullptr), ItemSize(0)
+	FInventoryItemInfo() : ItemName("Default"), Thumbnail(nullptr), ItemClass(nullptr), ItemWeight(1)
 	{
 	}
 };

@@ -8,12 +8,14 @@
 #include "Interface/InteractableInterface.h"
 #include "Interactable.generated.h"
 
+class UWidgetComponent;
+
 UCLASS()
 class INTERACTIONSYSTEMPLUGIN_API AInteractable : public AActor, public IInteractableInterface
 {
 	GENERATED_BODY()
 
-public:
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (RowType="/Script/InteractionSystemPlugin.InventoryItemInfo", AllowPrivateAccess = "true"))
 	FDataTableRowHandle ItemInfo;
 	
@@ -22,8 +24,10 @@ public:
 	AInteractable();
 
 protected:
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
 
 public:
 	// Called every frame
@@ -50,5 +54,5 @@ public:
 	
 	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
 	void EndFocus(AActor* Caller);
-	
+
 };
