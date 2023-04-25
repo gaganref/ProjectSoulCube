@@ -94,7 +94,8 @@ bool UInventorySystemComponent::RemoveItemByItemRowName(FName ItemRow)
 	}
 	
 	Inventory.Add(ItemRow, NewItemQuantity);
-
+	InventorySize -= Item->ItemWeight;
+	
 	if(RemoveItemDelegate.IsBound())
 	{
 		RemoveItemDelegate.Broadcast(ItemRow, NewItemQuantity);
