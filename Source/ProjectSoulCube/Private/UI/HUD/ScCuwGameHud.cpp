@@ -6,6 +6,7 @@
 #include "Components/InventorySystemComponent.h"
 #include "UI/Widgets/DataWidgets/ScCuwInteractableItemHelp.h"
 #include "UI/Widgets/PawnWidgets/ScCuwInventoryWidget.h"
+#include "UI/Widgets/PawnWidgets/ScCuwPawnStats.h"
 
 void UScCuwGameHud::NativePreConstruct()
 {
@@ -24,6 +25,7 @@ void UScCuwGameHud::NativeConstruct()
 
 void UScCuwGameHud::OnInit_Implementation(AController* Controller)
 {
+	PlayerStats->OnInit(Controller);
 	Inventory->OnInit(Controller);
 }
 

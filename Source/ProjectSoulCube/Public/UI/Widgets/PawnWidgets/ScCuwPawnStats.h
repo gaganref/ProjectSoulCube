@@ -18,11 +18,26 @@ class PROJECTSOULCUBE_API UScCuwPawnStats : public UScCommonUserWidget
 private:
 	UPROPERTY(BlueprintGetter = GetHealthBar, meta = (BindWidget))
 	TObjectPtr<class UScCuwProgressBarWithLabel> HealthBar;
+
+	UPROPERTY(BlueprintGetter = GetShieldBar, meta = (BindWidget))
+	TObjectPtr<class UScCuwProgressBarWithLabel> ShieldBar;
+
+	UPROPERTY(BlueprintGetter = GetStaminaBar, meta = (BindWidget))
+	TObjectPtr<class UScCuwProgressBarWithLabel> StaminaBar;
 	
 protected:
 	virtual void NativePreConstruct() override;
 	
 	virtual void OnInit_Implementation(AController* Controller);
+
+	UFUNCTION()
+	void HandleHealthChange(float NewHealth);
+
+	UFUNCTION()
+	void HandleShieldChange(float NewShield);
+
+	UFUNCTION()
+	void HandleStaminaChange(float NewStamina);
 	
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -33,5 +48,11 @@ public:
 	
 	UFUNCTION(BlueprintGetter)
 	class UScCuwProgressBarWithLabel* GetHealthBar() const;
+
+	UFUNCTION(BlueprintGetter)
+	class UScCuwProgressBarWithLabel* GetShieldBar() const;
+
+	UFUNCTION(BlueprintGetter)
+	class UScCuwProgressBarWithLabel* GetStaminaBar() const;
 
 };

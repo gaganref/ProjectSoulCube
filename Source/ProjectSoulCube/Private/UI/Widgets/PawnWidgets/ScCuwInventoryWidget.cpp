@@ -29,7 +29,7 @@ void UScCuwInventoryWidget::OnInit_Implementation(AController* Controller)
 		return;
 	}
 	
-	PlayerPawn = Cast<APawn>(Controller->GetPawn());
+	PlayerPawn = Controller->GetPawn();
 	if(PlayerPawn)
 	{
 		if(PlayerPawn->GetClass()->ImplementsInterface(UInventoryInterface::StaticClass()))

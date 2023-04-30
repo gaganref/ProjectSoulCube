@@ -46,6 +46,8 @@ void ASCHUDGame::OnInit_Implementation()
 			}
 		}
 	}
+
+	
 }
 
 void ASCHUDGame::OnInventoryPressed_Implementation(const bool bShouldOpenInventory)

@@ -62,7 +62,9 @@ void APlayerCharacter::BeginPlay()
 	if (AbilitySystemComponent)
 	{
 		// Attribute change callbacks
-		HealthChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PlayerAttributeSet->GetHealthAttribute()).AddUObject(this, &APlayerCharacter::HealthChanged);
+		HealthChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PlayerAttributeSet->GetHealthAttribute()).AddUObject(this, &APlayerCharacter::OnHealthChanged);
+		ShieldChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PlayerAttributeSet->GetShieldAttribute()).AddUObject(this, &APlayerCharacter::OnShieldChanged);
+		StaminaChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PlayerAttributeSet->GetStaminaAttribute()).AddUObject(this, &APlayerCharacter::OnStaminaChanged);
 	}
 }
 
@@ -178,8 +180,13 @@ void APlayerCharacter::HandleInventory(const FInputActionValue& ActionValue)
 	InventorySystemComponent->ToggleInventory();
 }
 
-void APlayerCharacter::HealthChanged(const FOnAttributeChangeData& Data)
+void APlayerCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
 {
+	if(PlayerHealthChangedDelegate.IsBound())
+	{
+		PlayerHealthChangedDelegate.Broadcast(Data.NewValue);
+	}
+	
 	if (IsAlive())
 	{
 		return;
@@ -189,6 +196,22 @@ void APlayerCharacter::HealthChanged(const FOnAttributeChangeData& Data)
 	// {
 	// 	Destroy();	
 	// }
+}
+
+void APlayerCharacter::OnShieldChanged(const FOnAttributeChangeData& Data)
+{
+	if(PlayerShieldChangedDelegate.IsBound())
+	{
+		PlayerShieldChangedDelegate.Broadcast(Data.NewValue);
+	}
+}
+
+void APlayerCharacter::OnStaminaChanged(const FOnAttributeChangeData& Data)
+{
+	if(PlayerStaminaChangedDelegate.IsBound())
+	{
+		PlayerStaminaChangedDelegate.Broadcast(Data.NewValue);
+	}
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -384,4 +407,19 @@ void APlayerCharacter::SetShield(float Shield)
 UInventorySystemComponent* APlayerCharacter::GetInventorySystemComponent_Implementation()
 {
 	return InventorySystemComponent;
+}
+
+FPlayerHealthChanged* APlayerCharacter::GetPlayerHealthChangedDelegate()
+{
+	return &PlayerHealthChangedDelegate;
+}
+
+FPlayerShieldChanged* APlayerCharacter::GetPlayerShieldChangedDelegate()
+{
+	return &PlayerShieldChangedDelegate;
+}
+
+FPlayerStaminaChanged* APlayerCharacter::GetPlayerStaminaChangedDelegate()
+{
+	return &PlayerStaminaChangedDelegate;
 }

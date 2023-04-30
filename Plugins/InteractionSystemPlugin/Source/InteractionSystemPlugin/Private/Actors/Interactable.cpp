@@ -36,20 +36,18 @@ FName AInteractable::GetItemId_Implementation()
 void AInteractable::OnInteract_Implementation(AActor* Caller)
 {
 	IInteractableInterface::OnInteract_Implementation(Caller);
-	
-	// TODO: apply its gameplay effect
 }
 
 void AInteractable::BeginFocus_Implementation(AActor* Caller)
 {
 	IInteractableInterface::BeginFocus_Implementation(Caller);
 
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Green, FString::Printf(TEXT("%s Debug- Begin Focus."), *GetItemId_Implementation().ToString()));
+	// if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Green, FString::Printf(TEXT("%s Debug- Begin Focus."), *GetItemId_Implementation().ToString()));
 }
 
 void AInteractable::EndFocus_Implementation(AActor* Caller)
 {
 	IInteractableInterface::EndFocus_Implementation(Caller);
 
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString::Printf(TEXT("%s Debug- End Focus."), *GetItemId_Implementation().ToString()));
+	// if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString::Printf(TEXT("%s Debug- End Focus."), *GetItemId_Implementation().ToString()));
 }

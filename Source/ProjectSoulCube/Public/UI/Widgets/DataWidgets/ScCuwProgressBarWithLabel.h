@@ -19,6 +19,15 @@ class PROJECTSOULCUBE_API UScCuwProgressBarWithLabel : public UScCommonUserWidge
 private:
 	UPROPERTY(EditAnywhere, BlueprintGetter = GetText, BlueprintSetter = SetText)
 	FText Text;
+
+	UPROPERTY(EditAnywhere)
+	FLinearColor ProgressBarColor;
+
+	UPROPERTY(BlueprintGetter = GetValue, BlueprintSetter = SetValue)
+	float Value = 75.0f;
+
+	UPROPERTY(BlueprintGetter = GetValue, BlueprintSetter = SetValue)
+	float MaxValue = 100.0f;
 	
 private:
 	UPROPERTY(BlueprintGetter = GetProgressBar, meta = (BindWidget))
@@ -35,6 +44,12 @@ public:
 
 	UFUNCTION(BlueprintGetter)
 	FText GetText() const;
+
+	UFUNCTION(BlueprintGetter)
+	float GetValue() const;
+	
+	UFUNCTION(BlueprintGetter)
+	float GetMaxValue() const;
 	
 	UFUNCTION(BlueprintGetter)
 	class UProgressBar* GetProgressBar() const;
@@ -47,4 +62,14 @@ public:
 
 	UFUNCTION(BlueprintSetter)
 	void SetText(const FText& NewText);
+
+	UFUNCTION(BlueprintSetter)
+	void SetValue(const float NewValue);
+	
+	UFUNCTION(BlueprintSetter)
+	void SetMaxValue(const float NewValue);
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void UpdateFillPercentage() const;
 };

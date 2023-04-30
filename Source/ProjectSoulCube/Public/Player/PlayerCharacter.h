@@ -7,13 +7,14 @@
 #include "GameFramework/Character.h"
 #include "Interface/CubeControllerInterface.h"
 #include "Interface/InventoryInterface.h"
+#include "Interface/PlayerStatsInterface.h"
 #include "PlayerCharacter.generated.h"
 
 struct FOnAttributeChangeData;
 class UInputAction;
 
 UCLASS()
-class PROJECTSOULCUBE_API APlayerCharacter : public ACharacter, public ICubeControllerInterface, public IAbilitySystemInterface, public IInventoryInterface
+class PROJECTSOULCUBE_API APlayerCharacter : public ACharacter, public ICubeControllerInterface, public IAbilitySystemInterface, public IInventoryInterface, public IPlayerStatsInterface
 {
 	GENERATED_BODY()
 
@@ -110,12 +111,22 @@ protected:
 protected:
 
 	FDelegateHandle HealthChangedDelegateHandle;
+	FDelegateHandle ShieldChangedDelegateHandle;
+	FDelegateHandle StaminaChangedDelegateHandle;
+
+	FPlayerHealthChanged PlayerHealthChangedDelegate;
+	FPlayerShieldChanged PlayerShieldChangedDelegate;
+	FPlayerStaminaChanged PlayerStaminaChangedDelegate;
 
 	
 public:
 	
 	/** Returns Follow Camera */
 	FORCEINLINE TObjectPtr<AFollowCameraActor> GetFollowCameraActor() const { return FollowCamera;}
+
+	virtual FPlayerHealthChanged* GetPlayerHealthChangedDelegate() override;
+	virtual FPlayerShieldChanged* GetPlayerShieldChangedDelegate() override;
+	virtual FPlayerStaminaChanged* GetPlayerStaminaChangedDelegate() override;
 
 protected:
 
@@ -128,13 +139,9 @@ protected:
 	virtual void AddCharacterAbilities();
 	
 	// Interface to handle movement input 
-	UFUNCTION(Category = "CubeControllerInterface", BlueprintNativeEvent, BlueprintCallable, meta = (DisplayName = "Handle Move"))
-	void HandleInputMove(const FInputActionValue& ActionValue);
 	virtual void HandleInputMove_Implementation(const FInputActionValue& ActionValue) override;
 
 	// Interface to handle look input
-	UFUNCTION(Category = "CubeControllerInterface", BlueprintNativeEvent, BlueprintCallable, meta = (DisplayName = "Handle Look"))
-	void HandleInputLook(const FInputActionValue& ActionValue);
 	virtual void HandleInputLook_Implementation(const FInputActionValue& ActionValue) override;
 
 protected:
@@ -150,7 +157,11 @@ protected:
 	// Called to handle Inventory
 	void HandleInventory(const FInputActionValue& ActionValue);
 
-	virtual void HealthChanged(const FOnAttributeChangeData& Data);
+	virtual void OnHealthChanged(const FOnAttributeChangeData& Data);
+
+	virtual void OnShieldChanged(const FOnAttributeChangeData& Data);
+
+	virtual void OnStaminaChanged(const FOnAttributeChangeData& Data);
 	
 public:
 
@@ -164,31 +175,21 @@ public:
 	virtual UInventorySystemComponent* GetInventorySystemComponent_Implementation() override;
 	//~ End IAbilitySystemInterface
 
-	UFUNCTION(BlueprintCallable, Category = "Character|Attributes")
-	float GetHealth() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Character|Attributes")
-	float GetMaxHealth() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Character|Attributes")
-	float GetHealthRegenRate() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Character|Attributes")
-	virtual bool IsAlive() const;
-
-	UFUNCTION(BlueprintCallable, Category = "GASShooter|GSCharacter|Attributes")
-	float GetStamina() const;
-
-	UFUNCTION(BlueprintCallable, Category = "GASShooter|GSCharacter|Attributes")
-	float GetMaxStamina() const;
-
-	UFUNCTION(BlueprintCallable, Category = "GASShooter|GSCharacter|Attributes")
-	float GetShield() const;
-
-	UFUNCTION(BlueprintCallable, Category = "GASShooter|GSCharacter|Attributes")
-	float GetMaxShield() const;
+	virtual float GetHealth() const override;
 	
-public:
+	virtual float GetMaxHealth() const override;
+	
+	virtual float GetHealthRegenRate() const override;
+	
+	virtual bool IsAlive() const override;
+	
+	virtual float GetStamina() const override;
+	
+	virtual float GetMaxStamina() const override;
+	
+	virtual float GetShield() const override;
+	
+	virtual float GetMaxShield() const override;
 
 	/**
 	* Setters for Attributes. Only use these in special cases like Respawning, otherwise use a GE to change Attributes.
