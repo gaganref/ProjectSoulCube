@@ -4,13 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "UI/Interface/InteractableItemHudInterface.h"
 #include "SCHUDGame.generated.h"
 
+class IInteractableInterface;
 /**
  * 
  */
 UCLASS()
-class PROJECTSOULCUBE_API ASCHUDGame : public AHUD
+class PROJECTSOULCUBE_API ASCHUDGame : public AHUD, public IInteractableItemHudInterface
 {
 	GENERATED_BODY()
 
@@ -39,6 +41,10 @@ protected:
 	virtual void OnInit_Implementation();
 
 	virtual void OnInventoryPressed_Implementation(const bool bShouldOpenInventory);
+
+	virtual void ShowItemInfo_Implementation(AActor* InteractableRef) override;
+	
+	virtual void HideItemInfo_Implementation(AActor* InteractableRef) override;
 	
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -46,6 +52,12 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnInventoryPressed(const bool bShouldOpenInventory);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ShowItemInfo(AActor* InteractableRef);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void HideItemInfo(AActor* InteractableRef);
 	
 public:
 	UFUNCTION(BlueprintGetter)

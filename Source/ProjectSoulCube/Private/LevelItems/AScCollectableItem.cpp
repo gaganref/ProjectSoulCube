@@ -5,8 +5,13 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
+#include "Components/InterpToMovementComponent.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/HUD.h"
+#include "GameFramework/RotatingMovementComponent.h"
 #include "GAS/GameplayEffects/SCGameplayEffect.h"
+#include "Kismet/GameplayStatics.h"
+#include "UI/Interface/InteractableItemHudInterface.h"
 
 
 // Sets default values
@@ -21,11 +26,9 @@ AAScCollectableItem::AAScCollectableItem()
 	InteractableMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Interactable Mesh"));
 	InteractableMesh->SetupAttachment(RootComponent);
 
-	HelpWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("hep Widget"));
-	HelpWidget->SetupAttachment(InteractableMesh);
-	HelpWidget->SetVisibility(false);
-	HelpWidget->SetWidgetSpace(EWidgetSpace::Screen);
-	HelpWidget->SetDrawSize(FVector2D(250.0f, 250.0f));
+	// For simple mesh animation
+	InterpToMovementComponent = CreateDefaultSubobject<UInterpToMovementComponent>(TEXT("Interep To Movement"));
+	RotatingMovementComponent = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("Rotating Movement"));
 }
 
 void AAScCollectableItem::OnConstruction(const FTransform& Transform)
@@ -44,22 +47,18 @@ void AAScCollectableItem::BeginPlay()
 
 void AAScCollectableItem::AdjustInteractablePosition()
 {
-	if(!bAutoSetInteractableLocalOffset)
+	if(bAutoSetInteractableLocalOffset)
 	{
-		return;
-	}
-	if(!InteractableMesh->GetStaticMesh())
-	{
-		return;
-	}
+		if(InteractableMesh->GetStaticMesh())
+		{
+			const FVector UpVector = GetActorUpVector();
+			const FVector BoxExtent = InteractableMesh->GetStaticMesh()->GetBounds().BoxExtent;
+			const FVector TargetLocation = (BoxExtent * UpVector) / 2.0f;
+			InteractableMesh->SetRelativeLocation(TargetLocation + OffsetAdjuster);
 	
-	const FVector UpVector = GetActorUpVector();
-	const FVector BoxExtent = InteractableMesh->GetStaticMesh()->GetBounds().BoxExtent;
-	const FVector TargetLocation = (BoxExtent * UpVector) / 2.0f;
-	InteractableMesh->SetRelativeLocation(TargetLocation);
-	
-	const FVector TargetWidgetLocation = BoxExtent * (UpVector * -1.0f);
-	HelpWidget->SetRelativeLocation(TargetWidgetLocation);
+			const FVector TargetWidgetLocation = BoxExtent * (UpVector * -1.0f);
+		}
+	}
 }
 
 // Called every frame
@@ -77,6 +76,9 @@ void AAScCollectableItem::OnInteract_Implementation(AActor* Caller)
 {
 	IInteractableInterface::OnInteract_Implementation(Caller);
 
+	// Make sure to end the focus
+	// EndFocus(Caller);
+	
 	// TODO: apply its gameplay effect
 	if(!Caller || !ItemGameplayAffectClass)
 	{
@@ -111,14 +113,32 @@ void AAScCollectableItem::BeginFocus_Implementation(AActor* Caller)
 {
 	IInteractableInterface::BeginFocus_Implementation(Caller);
 
-	HelpWidget->SetVisibility(true);
+	TObjectPtr<APlayerController> ControllerRef=  UGameplayStatics::GetPlayerController(this, 0);
+	TObjectPtr<AHUD> HudRef= ControllerRef->GetHUD();
+
+	if(HudRef)
+	{
+		if(HudRef->GetClass()->ImplementsInterface(UInteractableItemHudInterface::StaticClass()))
+		{
+			IInteractableItemHudInterface::Execute_ShowItemInfo(HudRef, this);
+		}
+	}
 }
 
 void AAScCollectableItem::EndFocus_Implementation(AActor* Caller)
 {
 	IInteractableInterface::EndFocus_Implementation(Caller);
 
-	HelpWidget->SetVisibility(false);
+	TObjectPtr<APlayerController> ControllerRef=  UGameplayStatics::GetPlayerController(this, 0);
+	TObjectPtr<AHUD> HudRef= ControllerRef->GetHUD();
+
+	if(HudRef)
+	{
+		if(HudRef->GetClass()->ImplementsInterface(UInteractableItemHudInterface::StaticClass()))
+		{
+			IInteractableItemHudInterface::Execute_HideItemInfo(HudRef, this);
+		}
+	}
 }
 
 bool AAScCollectableItem::CanInteract_Implementation(AActor* Caller)

@@ -163,9 +163,11 @@ void UInteractionDetectionComponent::OnItemUseButtonPressed(const FInputActionVa
 
 	if(FocusedActor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
 	{
-		if(!IInteractableInterface::Execute_CanInteract(FocusedActor, OwnerPawn))	// Stop use item if we cannot interact with the items
+		if(IInteractableInterface::Execute_CanInteract(FocusedActor, OwnerPawn))	// Stop use item if we cannot interact with the items
 		{
+			EndFocusOnActor(FocusedActor);
 			IInteractableInterface::Execute_OnInteract(FocusedActor, OwnerPawn);
+			FocusedActor = nullptr;
 		}
 	}
 	
@@ -185,7 +187,9 @@ void UInteractionDetectionComponent::OnItemPickupButtonPressed(const FInputActio
 	
 	bIsInteractingWithFocusedActor = true;
 	
+	EndFocusOnActor(FocusedActor);
 	InventoryRef->AddItem(FocusedActor);
+	FocusedActor = nullptr;
 	
 	bIsInteractingWithFocusedActor = false;
 }

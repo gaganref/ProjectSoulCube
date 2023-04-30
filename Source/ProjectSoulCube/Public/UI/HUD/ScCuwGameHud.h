@@ -6,6 +6,7 @@
 #include "CommonUserWidget.h"
 #include "ScCuwGameHud.generated.h"
 
+class IInteractableInterface;
 /**
  * 
  */
@@ -21,6 +22,9 @@ private:
 	UPROPERTY(BlueprintGetter = GetInventory, meta = (BindWidget))
 	TObjectPtr<class UScCuwInventoryWidget> Inventory;
 
+	UPROPERTY(BlueprintGetter = GetInteractableItemHelp, meta = (BindWidget))
+	TObjectPtr<class UScCuwInteractableItemHelp> InteractableItemHelp;
+	
 	UPROPERTY(EditAnywhere)
 	FKey ToggleInventoryPrimaryKey = EKeys::I;
 
@@ -34,12 +38,21 @@ protected:
 	
 	virtual void OnInit_Implementation(AController* Controller);
 
+	virtual void ShowItemHelp_Implementation(AActor* Item);
+
+	virtual void HideItemHelp_Implementation(AActor* Item);
+
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnInit(AController* Controller);
-	
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ShowItemHelp(AActor* Item);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void HideItemHelp(AActor* Item);
 public:
 	// Getters
 	
@@ -48,4 +61,7 @@ public:
 
 	UFUNCTION(BlueprintGetter)
 	class UScCuwInventoryWidget* GetInventory() const;
+
+	UFUNCTION(BlueprintGetter)
+	class UScCuwInteractableItemHelp* GetInteractableItemHelp() const;
 };

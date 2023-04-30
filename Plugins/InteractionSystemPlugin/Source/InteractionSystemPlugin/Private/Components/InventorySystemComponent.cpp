@@ -71,6 +71,7 @@ void UInventorySystemComponent::AddItem(AActor* Actor)
 	{
 		AddItemDelegate.Broadcast(RowName, NewItemQuantity);
 	}
+	
 	Actor->Destroy();
 }
 

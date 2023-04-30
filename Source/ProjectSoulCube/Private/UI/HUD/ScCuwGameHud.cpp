@@ -4,6 +4,7 @@
 #include "UI/HUD/ScCuwGameHud.h"
 
 #include "Components/InventorySystemComponent.h"
+#include "UI/Widgets/DataWidgets/ScCuwInteractableItemHelp.h"
 #include "UI/Widgets/PawnWidgets/ScCuwInventoryWidget.h"
 
 void UScCuwGameHud::NativePreConstruct()
@@ -17,12 +18,24 @@ void UScCuwGameHud::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	InteractableItemHelp->SetVisibility(ESlateVisibility::Collapsed);
 	SetFocus();
 }
 
 void UScCuwGameHud::OnInit_Implementation(AController* Controller)
 {
+	Inventory->OnInit(Controller);
+}
 
+void UScCuwGameHud::ShowItemHelp_Implementation(AActor* Item)
+{
+	InteractableItemHelp->SetParentItemRef(Item);
+	InteractableItemHelp->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UScCuwGameHud::HideItemHelp_Implementation(AActor* Item)
+{
+	InteractableItemHelp->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 FReply UScCuwGameHud::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
@@ -53,4 +66,9 @@ UScCuwPawnStats* UScCuwGameHud::GetPlayerStats() const
 UScCuwInventoryWidget* UScCuwGameHud::GetInventory() const
 {
 	return Inventory;
+}
+
+UScCuwInteractableItemHelp* UScCuwGameHud::GetInteractableItemHelp() const
+{
+	return InteractableItemHelp;
 }

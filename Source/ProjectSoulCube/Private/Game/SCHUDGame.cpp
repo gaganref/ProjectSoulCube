@@ -67,6 +67,20 @@ void ASCHUDGame::OnInventoryPressed_Implementation(const bool bShouldOpenInvento
 	}
 }
 
+void ASCHUDGame::ShowItemInfo_Implementation(AActor* InteractableRef)
+{
+	IInteractableItemHudInterface::ShowItemInfo_Implementation(InteractableRef);
+
+	HudWidget->ShowItemHelp(InteractableRef);
+}
+
+void ASCHUDGame::HideItemInfo_Implementation(AActor* InteractableRef)
+{
+	IInteractableItemHudInterface::HideItemInfo_Implementation(InteractableRef);
+	
+	HudWidget->HideItemHelp(InteractableRef);
+}
+
 UScCuwGameHud* ASCHUDGame::GetHudWidget() const
 {
 	return HudWidget;

@@ -6,6 +6,8 @@
 #include "Actors/Interactable.h"
 #include "AScCollectableItem.generated.h"
 
+class URotatingMovementComponent;
+class UInterpToMovementComponent;
 class USCGameplayEffect;
 
 UCLASS()
@@ -21,11 +23,17 @@ private:
 	TObjectPtr<UStaticMeshComponent> InteractableMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UWidgetComponent> HelpWidget;
+	TObjectPtr<UInterpToMovementComponent> InterpToMovementComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<URotatingMovementComponent> RotatingMovementComponent;
 	
 protected:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	bool bAutoSetInteractableLocalOffset = true;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	FVector OffsetAdjuster;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<USCGameplayEffect> ItemGameplayAffectClass;
@@ -42,7 +50,7 @@ protected:
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
 	// To make sure that the interactable is above the origin of the actor.
 	virtual void AdjustInteractablePosition();
 	
@@ -80,5 +88,4 @@ public:
 public:
 	FORCEINLINE UStaticMeshComponent* GetInteractableMesh() const { return InteractableMesh; }
 
-	FORCEINLINE UWidgetComponent* GetHelpWidget() const { return HelpWidget; }	
 };
