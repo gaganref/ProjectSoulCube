@@ -188,8 +188,10 @@ protected:
 
 	virtual void OnStaminaChanged(const FOnAttributeChangeData& Data);
 
+	UFUNCTION(BlueprintCallable)
 	virtual void StartSprinting();
-	
+
+	UFUNCTION(BlueprintCallable)
 	virtual void StopSprinting();
 	
 public:
