@@ -56,8 +56,15 @@ void ACubeController::SetupInputComponent()
 
 	if(EnhancedInputComponent)
 	{
-		EnhancedInputComponent->BindAction(InputActionMove, ETriggerEvent::Triggered, this, &ACubeController::HandleMove);
-		EnhancedInputComponent->BindAction(InputActionLook, ETriggerEvent::Triggered, this, &ACubeController::HandleLook);
+		
+		if(InputActionMove && ensure(InputActionMove->ValueType == EInputActionValueType::Axis2D))
+		{
+			EnhancedInputComponent->BindAction(InputActionMove, ETriggerEvent::Triggered, this, &ACubeController::HandleMove);
+		}
+		if(InputActionLook && ensure(InputActionLook->ValueType == EInputActionValueType::Axis2D))
+		{
+			EnhancedInputComponent->BindAction(InputActionLook, ETriggerEvent::Triggered, this, &ACubeController::HandleLook);
+		}
 	}
 }
 

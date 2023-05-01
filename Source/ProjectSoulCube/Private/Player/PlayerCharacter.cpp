@@ -12,6 +12,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/InteractionDetectionComponent.h"
 #include "Components/InventorySystemComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GAS/SCAbilitySystemComponent.h"
 #include "GAS/Abilities/SCGameplayAbility.h"
@@ -50,6 +51,8 @@ APlayerCharacter::APlayerCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
+
+	DeadTag = FGameplayTag::RequestGameplayTag(FName("State.Dead"));
 }
 
 // Called when the game starts or when spawned
@@ -83,10 +86,38 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	if(EnhancedInputComponent)
 	{
-		EnhancedInputComponent->BindAction(InputActionItemPickUp, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleItemPickup);
-		EnhancedInputComponent->BindAction(InputActionItemUse, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleItemUse);
-		EnhancedInputComponent->BindAction(InputActionInventory, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleInventory);
+		if(InputActionItemPickUp && ensure(InputActionItemPickUp->ValueType == EInputActionValueType::Boolean))
+		{
+			EnhancedInputComponent->BindAction(InputActionItemPickUp, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleItemPickup);
+		}
+		if(InputActionItemUse && ensure(InputActionItemUse->ValueType == EInputActionValueType::Boolean))
+		{
+			EnhancedInputComponent->BindAction(InputActionItemUse, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleItemUse);
+		}
+		if(InputActionInventory && ensure(InputActionInventory->ValueType == EInputActionValueType::Boolean))
+		{
+			EnhancedInputComponent->BindAction(InputActionInventory, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleInventory);
+		}
+		if(InputActionSprint && ensure(InputActionSprint->ValueType == EInputActionValueType::Boolean))
+		{
+			EnhancedInputComponent->BindAction(InputActionSprint, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleSprint);
+		}
 	}
+	
+	// // Bind to AbilitySystemComponent
+	// // Not Required because we are emulating and using local input
+	// AbilitySystemComponent->BindAbilityActivationToInputComponent
+	// (
+	// 	PlayerInputComponent,
+	// 	FGameplayAbilityInputBinds
+	// 	(
+	// 		FString("ConfirmTarget"),
+	// 		FString("CancelTarget"),
+	// 		FString("ESCAbilityInputID"),
+	// 		static_cast<int32>(ESCAbilityInputID::Confirm),	// need to be in both enum and project input actions
+	// 		static_cast<int32>(ESCAbilityInputID::Cancel)
+	// 	)
+	// );
 }
 
 void APlayerCharacter::InitializeCustomCamera()
@@ -156,7 +187,7 @@ void APlayerCharacter::HandleInputLook_Implementation(const FInputActionValue& A
 
 	// input is a Vector2D
 	const FVector2D LookAxisVector = ActionValue.Get<FVector2D>();
-
+	
 	if (Controller != nullptr)
 	{
 		// add yaw and pitch input to controller
@@ -180,6 +211,11 @@ void APlayerCharacter::HandleInventory(const FInputActionValue& ActionValue)
 	InventorySystemComponent->ToggleInventory();
 }
 
+void APlayerCharacter::HandleSprint(const FInputActionValue& ActionValue)
+{
+	SendAbilityLocalInput(ActionValue, SprintAbilityClass, ESCAbilityInputID::Sprint);
+}
+
 void APlayerCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
 {
 	if(PlayerHealthChangedDelegate.IsBound())
@@ -187,15 +223,11 @@ void APlayerCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
 		PlayerHealthChangedDelegate.Broadcast(Data.NewValue);
 	}
 	
-	if (IsAlive())
+	// If the player died, handle death
+	if (!IsAlive() && !AbilitySystemComponent->HasMatchingGameplayTag(DeadTag))
 	{
-		return;
+		Die();
 	}
-
-	// if(IsValid(this))
-	// {
-	// 	Destroy();	
-	// }
 }
 
 void APlayerCharacter::OnShieldChanged(const FOnAttributeChangeData& Data)
@@ -212,6 +244,47 @@ void APlayerCharacter::OnStaminaChanged(const FOnAttributeChangeData& Data)
 	{
 		PlayerStaminaChangedDelegate.Broadcast(Data.NewValue);
 	}
+}
+
+void APlayerCharacter::StartSprinting()
+{
+	if(GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed() * PlayerSprintSpeedMultiplier;
+	}
+}
+
+void APlayerCharacter::StopSprinting()
+{
+	if(GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed();
+	}
+}
+
+void APlayerCharacter::Die()
+{
+	// TODO: Handle death
+	RemoveCharacterAbilities();
+	
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCharacterMovement()->GravityScale = 0;
+	GetCharacterMovement()->Velocity = FVector(0);
+	
+	// OnCharacterDied.Broadcast(this);
+	
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->CancelAllAbilities();
+	
+		// FGameplayTagContainer EffectTagsToRemove;
+		// EffectTagsToRemove.AddTag(EffectRemoveOnDeathTag);
+		// int32 NumEffectsRemoved = AbilitySystemComponent->RemoveActiveEffectsWithTags(EffectTagsToRemove);
+	
+		AbilitySystemComponent->AddLooseGameplayTag(DeadTag);
+	}
+
+	Destroy();
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -232,6 +305,11 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 		SetHealth(GetMaxHealth());
 		SetShield(GetMaxShield());
 		SetStamina(GetMaxStamina());
+
+		if(GetCharacterMovement())
+		{
+			GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed();
+		}
 	}
 	
 	// ASC MixedMode replication requires that the ASC Owner's Owner be the Controller.
@@ -290,12 +368,21 @@ void APlayerCharacter::AddStartupEffects()
 
 void APlayerCharacter::AddCharacterAbilities()
 {
-	// Grant abilities, but only on the server	
-	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent || AbilitySystemComponent->AreStartupEffectsApplied())
+	if (!AbilitySystemComponent || AbilitySystemComponent->AreCharacterAbilitiesGiven())
 	{
 		return;
 	}
 
+	AbilitySystemComponent->GiveAbility(
+			FGameplayAbilitySpec
+			(
+				SprintAbilityClass,
+				GetAbilityLevel(SprintAbilityClass.GetDefaultObject()->AbilityID),
+				static_cast<int32>(SprintAbilityClass.GetDefaultObject()->AbilityInputID),
+				this
+			)
+	);
+	
 	// for (TSubclassOf<USCGameplayAbility>& StartupAbility : CharacterAbilities)
 	// {
 	// 	AbilitySystemComponent->GiveAbility(
@@ -303,6 +390,62 @@ void APlayerCharacter::AddCharacterAbilities()
 	// }
 
 	AbilitySystemComponent->SetCharacterAbilitiesGiven(true);
+}
+
+void APlayerCharacter::RemoveCharacterAbilities()
+{
+	if (!AbilitySystemComponent || !AbilitySystemComponent->AreCharacterAbilitiesGiven())
+	{
+		return;
+	}
+
+	TArray<FGameplayAbilitySpecHandle> AbilitiesToRemove;
+	
+	// for (const FGameplayAbilitySpec& Spec : AbilitySystemComponent->GetActivatableAbilities())
+	// {
+	// 	if ((Spec.SourceObject == this) && CharacterAbilities.Contains(Spec.Ability->GetClass()))
+	// 	{
+	// 		AbilitiesToRemove.Add(Spec.Handle);
+	// 	}
+	// }
+
+	for (const FGameplayAbilitySpec& Spec : AbilitySystemComponent->GetActivatableAbilities())
+	{
+		if ((Spec.SourceObject == this) && Spec.Ability->GetClass() == SprintAbilityClass)
+		{
+			AbilitiesToRemove.Add(Spec.Handle);
+		}
+	}
+
+	for (int32 i = 0; i < AbilitiesToRemove.Num(); i++)
+	{
+		AbilitySystemComponent->ClearAbility(AbilitiesToRemove[i]);
+	}
+	
+	AbilitySystemComponent->SetCharacterAbilitiesGiven(false);
+}
+
+void APlayerCharacter::SendAbilityLocalInput(const FInputActionValue& InActionValue, const TSubclassOf<USCGameplayAbility> InAbilityClass, const ESCAbilityInputID InInputId)
+{
+	if(!AbilitySystemComponent || !InAbilityClass)
+	{
+		return;
+	}
+	if(InActionValue.GetValueType() != EInputActionValueType::Boolean)
+	{
+		return;
+	}
+
+	if(InActionValue.Get<bool>())
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s Pressed"), *UEnum::GetValueAsString(InInputId));
+		AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(InInputId));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s Released"), *UEnum::GetValueAsString(InInputId));
+		AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(InInputId));
+	}
 }
 
 float APlayerCharacter::GetHealth() const
@@ -375,9 +518,24 @@ float APlayerCharacter::GetMaxShield() const
 	return 0.0f;
 }
 
+float APlayerCharacter::GetMoveSpeed() const
+{
+	if (IsValid(PlayerAttributeSet))
+	{
+		return PlayerAttributeSet->GetMoveSpeed();
+	}
+
+	return 0.0f;
+}
+
 bool APlayerCharacter::IsAlive() const
 {
 	return GetHealth() > 0.0f;
+}
+
+int32 APlayerCharacter::GetAbilityLevel(ESCAbilityInputID AbilityID) const
+{
+	return 1;
 }
 
 void APlayerCharacter::SetHealth(float Health)

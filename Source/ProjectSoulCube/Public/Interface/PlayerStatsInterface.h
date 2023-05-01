@@ -42,6 +42,8 @@ public:
 
 	virtual float GetMaxShield() const = 0;
 
+	virtual float GetMoveSpeed() const = 0;
+
 	virtual FPlayerHealthChanged* GetPlayerHealthChangedDelegate() = 0;
 
 	virtual FPlayerShieldChanged* GetPlayerShieldChangedDelegate() = 0;

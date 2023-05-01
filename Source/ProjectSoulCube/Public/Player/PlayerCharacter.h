@@ -4,12 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTagContainer.h"
+#include "InputActionValue.h"
 #include "GameFramework/Character.h"
 #include "Interface/CubeControllerInterface.h"
 #include "Interface/InventoryInterface.h"
 #include "Interface/PlayerStatsInterface.h"
 #include "PlayerCharacter.generated.h"
 
+enum class ESCAbilityInputID : uint8;
 struct FOnAttributeChangeData;
 class UInputAction;
 
@@ -78,9 +81,14 @@ private:
 
 	UPROPERTY(Category = "Input", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UInputAction> InputActionInventory;
-	
+
+	UPROPERTY(Category = "Input", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UInputAction> InputActionSprint;
 
 protected:
+
+	UPROPERTY(Category = "Ability System", EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "1", ClampMax = "5"))
+	float PlayerSprintSpeedMultiplier = 2.9f;
 
 	UPROPERTY(Category = "Ability System", EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UInteractionDetectionComponent> InteractionDetectionComponent;
@@ -95,6 +103,9 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class UScPlayerAttributeSet> PlayerAttributeSet;
 
+	UPROPERTY()
+	bool AscInputBound = false;
+
 	// Default attributes for a character for initializing on spawn/respawn.
 	// This is an instant GE that overrides the values for attributes that get reset on spawn/respawn.
 	UPROPERTY(Category = "Ability System", EditAnywhere, BlueprintReadOnly)
@@ -104,9 +115,15 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability System")
 	TArray<TSubclassOf<class USCGameplayEffect>> StartupEffects;
 
-	// Default abilities for this Character. These will be removed on Character death and re-given if Character respawns.
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability System")
-	TArray<TSubclassOf<class USCGameplayAbility>> CharacterAbilities;
+	TSubclassOf<class USCGameplayAbility> SprintAbilityClass;
+	
+	// // Default abilities for this Character. These will be removed on Character death and re-given if Character respawns.
+	// UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability System")
+	// TArray<TSubclassOf<class USCGameplayAbility>> CharacterAbilities;
+
+protected:
+	FGameplayTag DeadTag;
 	
 protected:
 
@@ -137,6 +154,10 @@ protected:
 	virtual void AddStartupEffects();
 
 	virtual void AddCharacterAbilities();
+
+	virtual void RemoveCharacterAbilities();
+
+	virtual void SendAbilityLocalInput(const FInputActionValue& InActionValue, const TSubclassOf<USCGameplayAbility> InAbilityClass, const ESCAbilityInputID InInputId);
 	
 	// Interface to handle movement input 
 	virtual void HandleInputMove_Implementation(const FInputActionValue& ActionValue) override;
@@ -145,6 +166,8 @@ protected:
 	virtual void HandleInputLook_Implementation(const FInputActionValue& ActionValue) override;
 
 protected:
+
+	virtual void Die();
 	
 	virtual void PossessedBy(AController* NewController) override;
 
@@ -157,11 +180,17 @@ protected:
 	// Called to handle Inventory
 	void HandleInventory(const FInputActionValue& ActionValue);
 
+	void HandleSprint(const FInputActionValue& ActionValue);
+
 	virtual void OnHealthChanged(const FOnAttributeChangeData& Data);
 
 	virtual void OnShieldChanged(const FOnAttributeChangeData& Data);
 
 	virtual void OnStaminaChanged(const FOnAttributeChangeData& Data);
+
+	virtual void StartSprinting();
+	
+	virtual void StopSprinting();
 	
 public:
 
@@ -182,6 +211,8 @@ public:
 	virtual float GetHealthRegenRate() const override;
 	
 	virtual bool IsAlive() const override;
+
+	virtual int32 GetAbilityLevel(ESCAbilityInputID AbilityID) const;
 	
 	virtual float GetStamina() const override;
 	
@@ -190,6 +221,8 @@ public:
 	virtual float GetShield() const override;
 	
 	virtual float GetMaxShield() const override;
+
+	virtual float GetMoveSpeed() const override;
 
 	/**
 	* Setters for Attributes. Only use these in special cases like Respawning, otherwise use a GE to change Attributes.

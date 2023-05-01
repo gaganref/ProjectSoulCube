@@ -68,6 +68,10 @@ public:
 	FGameplayAttributeData Damage;
 	ATTRIBUTE_ACCESSORS(UScPlayerAttributeSet, Damage)
 
+	UPROPERTY(BlueprintReadOnly, Category = "MoveSpeed")
+	FGameplayAttributeData MoveSpeed;
+	ATTRIBUTE_ACCESSORS(UScPlayerAttributeSet, MoveSpeed)
+	
 public:
 
 	// AttributeSet Overrides
