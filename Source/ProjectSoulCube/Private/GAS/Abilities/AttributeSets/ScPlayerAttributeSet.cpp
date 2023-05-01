@@ -76,7 +76,7 @@ void UScPlayerAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 		// Handle other health changes.
 		// Health loss should go through Damage.
 		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
-	} // Health
+	}
 	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
 	{
 		// Handle stamina changes.

@@ -44,6 +44,8 @@ public:
 
 	virtual float GetMoveSpeed() const = 0;
 
+	virtual float GetMaxInventorySize() const = 0;
+
 	virtual FPlayerHealthChanged* GetPlayerHealthChangedDelegate() = 0;
 
 	virtual FPlayerShieldChanged* GetPlayerShieldChangedDelegate() = 0;

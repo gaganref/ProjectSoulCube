@@ -21,3 +21,4 @@ void USCGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 		bool ActivatedAbility = ActorInfo->AbilitySystemComponent->TryActivateAbility(Spec.Handle, false);
 	}
 }
+

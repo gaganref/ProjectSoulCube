@@ -68,6 +68,7 @@ void APlayerCharacter::BeginPlay()
 		HealthChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PlayerAttributeSet->GetHealthAttribute()).AddUObject(this, &APlayerCharacter::OnHealthChanged);
 		ShieldChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PlayerAttributeSet->GetShieldAttribute()).AddUObject(this, &APlayerCharacter::OnShieldChanged);
 		StaminaChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PlayerAttributeSet->GetStaminaAttribute()).AddUObject(this, &APlayerCharacter::OnStaminaChanged);
+		MaxInventorySizeChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PlayerAttributeSet->GetMaxInventorySizeAttribute()).AddUObject(this, &APlayerCharacter::OnMaxInventorySizeChanged);
 	}
 }
 
@@ -246,6 +247,14 @@ void APlayerCharacter::OnStaminaChanged(const FOnAttributeChangeData& Data)
 	}
 }
 
+void APlayerCharacter::OnMaxInventorySizeChanged(const FOnAttributeChangeData& Data)
+{
+	if(InventorySystemComponent)
+	{
+		InventorySystemComponent->SetMaxInventorySize(Data.NewValue);
+	}
+}
+
 void APlayerCharacter::StartSprinting()
 {
 	if(GetCharacterMovement())
@@ -309,6 +318,11 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 		if(GetCharacterMovement())
 		{
 			GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed();
+		}
+		if(InventorySystemComponent)
+		{
+			InventorySystemComponent->SetInventorySize(0);
+			InventorySystemComponent->SetMaxInventorySize(GetMaxInventorySize());
 		}
 	}
 	
@@ -523,6 +537,16 @@ float APlayerCharacter::GetMoveSpeed() const
 	if (IsValid(PlayerAttributeSet))
 	{
 		return PlayerAttributeSet->GetMoveSpeed();
+	}
+
+	return 0.0f;
+}
+
+float APlayerCharacter::GetMaxInventorySize() const
+{
+	if (IsValid(PlayerAttributeSet))
+	{
+		return PlayerAttributeSet->GetMaxInventorySize();
 	}
 
 	return 0.0f;

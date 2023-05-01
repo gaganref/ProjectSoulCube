@@ -130,6 +130,7 @@ protected:
 	FDelegateHandle HealthChangedDelegateHandle;
 	FDelegateHandle ShieldChangedDelegateHandle;
 	FDelegateHandle StaminaChangedDelegateHandle;
+	FDelegateHandle MaxInventorySizeChangedDelegateHandle;
 
 	FPlayerHealthChanged PlayerHealthChangedDelegate;
 	FPlayerShieldChanged PlayerShieldChangedDelegate;
@@ -188,6 +189,8 @@ protected:
 
 	virtual void OnStaminaChanged(const FOnAttributeChangeData& Data);
 
+	virtual void OnMaxInventorySizeChanged(const FOnAttributeChangeData& Data);
+	
 	UFUNCTION(BlueprintCallable)
 	virtual void StartSprinting();
 
@@ -225,6 +228,8 @@ public:
 	virtual float GetMaxShield() const override;
 
 	virtual float GetMoveSpeed() const override;
+	
+	virtual float GetMaxInventorySize() const override;
 
 	/**
 	* Setters for Attributes. Only use these in special cases like Respawning, otherwise use a GE to change Attributes.

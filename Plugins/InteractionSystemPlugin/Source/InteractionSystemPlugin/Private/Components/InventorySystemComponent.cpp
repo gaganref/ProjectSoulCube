@@ -5,6 +5,7 @@
 
 #include "Interface/InteractableInterface.h"
 #include "..\..\Public\Misc\InteractionStructs.h"
+#include "Interface/InventoryInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -17,11 +18,6 @@ UInventorySystemComponent::UInventorySystemComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
-}
-
-UInventorySystemComponent::~UInventorySystemComponent()
-{
-	// Inventory.Empty();
 }
 
 // Called when the game starts
@@ -65,7 +61,8 @@ void UInventorySystemComponent::AddItem(AActor* Actor)
 	const int NewItemQuantity = Inventory.FindRef(RowName) + 1;
 	Inventory.Add(RowName, NewItemQuantity);
 
-	InventorySize += Item->ItemWeight;
+	IncreaseInventorySize(Item->ItemWeight);
+	// InventorySize += Item->ItemWeight;
 	
 	if(AddItemDelegate.IsBound())
 	{
@@ -95,7 +92,9 @@ bool UInventorySystemComponent::RemoveItemByItemRowName(FName ItemRow)
 	}
 	
 	Inventory.Add(ItemRow, NewItemQuantity);
-	InventorySize -= Item->ItemWeight;
+
+	DecreaseInventorySize(Item->ItemWeight);
+	// InventorySize -= Item->ItemWeight;
 	
 	if(RemoveItemDelegate.IsBound())
 	{
@@ -187,7 +186,7 @@ bool UInventorySystemComponent::CanAddItem(AActor* Actor)
 		return false;
 	}
 	
-	if(InventorySize + Item->ItemWeight > MaxInventorySize)
+	if(GetInventorySize() + Item->ItemWeight > GetMaxInventorySize())
 	{
 		return false;
 	}
@@ -301,12 +300,32 @@ int32 UInventorySystemComponent::GetMaxInventorySize()
 	return MaxInventorySize;
 }
 
+void UInventorySystemComponent::IncreaseInventorySize(const int32 InSize)
+{
+	SetInventorySize(InventorySize + InSize);
+}
+
+void UInventorySystemComponent::DecreaseInventorySize(const int32 InSize)
+{
+	SetInventorySize(InventorySize - InSize);
+}
+
 void UInventorySystemComponent::SetInventorySize(const int32 InSize)
 {
 	InventorySize = InSize;
+	
+	if(InventorySizeChangedDelegate.IsBound())
+	{
+		InventorySizeChangedDelegate.Broadcast(InventorySize);
+	}
 }
 
 void UInventorySystemComponent::SetMaxInventorySize(const int32 InSize)
 {
 	MaxInventorySize = InSize;
+
+	if(MaxInventorySizeChangedDelegate.IsBound())
+	{
+		MaxInventorySizeChangedDelegate.Broadcast(MaxInventorySize);
+	}
 }

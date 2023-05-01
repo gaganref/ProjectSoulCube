@@ -71,6 +71,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "MoveSpeed")
 	FGameplayAttributeData MoveSpeed;
 	ATTRIBUTE_ACCESSORS(UScPlayerAttributeSet, MoveSpeed)
+
+	UPROPERTY(BlueprintReadOnly, Category = "Invnetory Size")
+	FGameplayAttributeData MaxInventorySize;
+	ATTRIBUTE_ACCESSORS(UScPlayerAttributeSet, MaxInventorySize)
 	
 public:
 

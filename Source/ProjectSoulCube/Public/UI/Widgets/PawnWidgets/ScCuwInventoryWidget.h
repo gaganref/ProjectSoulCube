@@ -19,8 +19,17 @@ class PROJECTSOULCUBE_API UScCuwInventoryWidget : public UScCommonUserWidget
 private:
 	UPROPERTY(EditAnywhere, BlueprintGetter = GetInventoryItemClass)
 	TSubclassOf<UUserWidget> InventoryItemClass;
+
+	UPROPERTY(EditAnywhere, BlueprintGetter = GetInventorySize, BlueprintSetter = SetInventorySize)
+	int32 InventorySize = 4;
+	
+	UPROPERTY(EditAnywhere, BlueprintGetter = GetMaxInventorySize, BlueprintSetter = SetMaxInventorySize)
+	int32 MaxInventorySize = 20;
 	
 private:
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTextBlock> InventorySizeText;
+	
 	UPROPERTY(BlueprintGetter = GetScrollBox, meta = (BindWidget))
 	TObjectPtr<class UScrollBox> ScrollBox;
 
@@ -47,6 +56,8 @@ protected:
 	
 	virtual void OnInit_Implementation(AController* Controller);
 
+	void UpdateInventorySizeText();
+
 	UFUNCTION()
 	void HandleInventoryItemAdd(const FName RowId, const int32 ItemQuantity);
 	
@@ -55,6 +66,12 @@ protected:
 
 	UFUNCTION()
 	void HandleToggleInventory(const bool bShouldOpenInventory);
+
+	UFUNCTION()
+	void HandleInventorySizeChanged(const int32 NewSize);
+
+	UFUNCTION()
+	void HandleMaxInventorySizeChanged(const int32 NewSize);
 
 	UFUNCTION()
 	void HandleInventoryItemButtonClicked(UScCuwInventoryItem* ItemReference);
@@ -79,6 +96,12 @@ public:
 	// Getters
 
 	UFUNCTION(BlueprintGetter)
+	int32 GetInventorySize() const;
+
+	UFUNCTION(BlueprintGetter)
+	int32 GetMaxInventorySize() const;
+
+	UFUNCTION(BlueprintGetter)
 	class UScrollBox* GetScrollBox() const;
 
 	UFUNCTION(BlueprintGetter)
@@ -97,4 +120,11 @@ public:
 
 	UFUNCTION(BlueprintGetter)
 	TSubclassOf<class UUserWidget> GetInventoryItemClass() const;
+
+public:
+	UFUNCTION(BlueprintSetter)
+	void SetInventorySize(const int32 NewSize);
+
+	UFUNCTION(BlueprintSetter)
+	void SetMaxInventorySize(const int32 NewSize);
 };

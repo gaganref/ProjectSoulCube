@@ -4,15 +4,20 @@
 #include "UI/Widgets/PawnWidgets/ScCuwInventoryWidget.h"
 
 #include "Components/InventorySystemComponent.h"
+#include "Components/TextBlock.h"
 #include "Components/WrapBox.h"
 #include "Interface/InventoryInterface.h"
 #include "Misc/InteractionStructs.h"
 #include "UI/Widgets/DataWidgets/ScCuwInventoryItemStats.h"
 #include "UI/Widgets/PawnWidgets/ScCuwInventoryItem.h"
 
+#define LOCTEXT_NAMESPACE "MassExtractor"
+
 void UScCuwInventoryWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
+
+	UpdateInventorySizeText();
 }
 
 void UScCuwInventoryWidget::NativeConstruct()
@@ -20,6 +25,7 @@ void UScCuwInventoryWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	SetVisibility(ESlateVisibility::Collapsed);
+	UpdateInventorySizeText();
 }
 
 void UScCuwInventoryWidget::OnInit_Implementation(AController* Controller)
@@ -62,9 +68,15 @@ void UScCuwInventoryWidget::OnInit_Implementation(AController* Controller)
 			}
 		}
 
+		InventorySize = InventoryRef->GetInventorySize();
+		MaxInventorySize = InventoryRef->GetMaxInventorySize();
+		UpdateInventorySizeText();
+		
 		InventoryRef->GetAddItemDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleInventoryItemAdd);
 		InventoryRef->GetRemoveItemDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleInventoryItemRemove);
 		InventoryRef->GetInventoryPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleToggleInventory);
+		InventoryRef->GetInventorySizeChangedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleInventorySizeChanged);
+		InventoryRef->GetMaxInventorySizeChangedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleMaxInventorySizeChanged);
 	}
 
 	if(InventoryItemStats)
@@ -72,6 +84,14 @@ void UScCuwInventoryWidget::OnInit_Implementation(AController* Controller)
 		InventoryItemStats->GetItemUseButtonPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleItemUseButtonPressed);
 		InventoryItemStats->GetItemDropButtonPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleItemDropButtonPressed);
 		InventoryItemStats->GetItemCancelButtonPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleItemCancelButtonPressed);
+	}
+}
+
+void UScCuwInventoryWidget::UpdateInventorySizeText()
+{
+	if(InventorySizeText)
+	{
+		InventorySizeText->SetText(FText::Format(LOCTEXT("SnippetHeader", "{0}/{1}"), InventorySize, MaxInventorySize));
 	}
 }
 
@@ -103,6 +123,18 @@ void UScCuwInventoryWidget::HandleToggleInventory(const bool bShouldOpenInventor
 	}
 
 	InventoryItemStats->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+void UScCuwInventoryWidget::HandleInventorySizeChanged(const int32 NewSize)
+{
+	SetInventorySize(NewSize);
+	UpdateInventorySizeText();
+}
+
+void UScCuwInventoryWidget::HandleMaxInventorySizeChanged(const int32 NewSize)
+{
+	SetMaxInventorySize(NewSize);
+	UpdateInventorySizeText();
 }
 
 void UScCuwInventoryWidget::HandleInventoryItemButtonClicked(UScCuwInventoryItem* ItemReference)
@@ -177,6 +209,16 @@ void UScCuwInventoryWidget::HandleItemCancelButtonPressed(UScCuwInventoryItem* I
 	InventoryItemStats->SetVisibility(ESlateVisibility::Collapsed);
 }
 
+int32 UScCuwInventoryWidget::GetInventorySize() const
+{
+	return InventorySize;
+}
+
+int32 UScCuwInventoryWidget::GetMaxInventorySize() const
+{
+	return MaxInventorySize;
+}
+
 UScrollBox* UScCuwInventoryWidget::GetScrollBox() const
 {
 	return ScrollBox;
@@ -211,3 +253,15 @@ const TMap<FName, TObjectPtr<UScCuwInventoryItem>>& UScCuwInventoryWidget::GetIn
 {
 	return InventoryItems;
 }
+
+void UScCuwInventoryWidget::SetInventorySize(const int32 NewSize)
+{
+	InventorySize = NewSize;
+}
+
+void UScCuwInventoryWidget::SetMaxInventorySize(const int32 NewSize)
+{
+	MaxInventorySize = NewSize;
+}
+
+#undef LOCTEXT_NAMESPACE

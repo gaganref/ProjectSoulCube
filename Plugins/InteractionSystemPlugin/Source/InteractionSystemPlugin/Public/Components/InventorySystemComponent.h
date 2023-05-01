@@ -10,6 +10,8 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAddItem, const FName, ItemRowId, const int32, ItemQuantity);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRemoveItem, const FName, ItemRowId, const int32, ItemQuantity);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryPressed, const bool, bShouldOpenInventory);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventorySizeChanged, const int32, NewSize);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxInventorySizeChanged, const int32, NewSize);
 
 class UDataTable;
 struct FInventoryItemInfo;
@@ -22,12 +24,11 @@ class INTERACTIONSYSTEMPLUGIN_API UInventorySystemComponent : public UActorCompo
 	GENERATED_BODY()
 
 private:
-	
-	UPROPERTY(BlueprintGetter = GetInventorySize, BlueprintSetter = SetInventorySize, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintGetter = GetInventorySize, BlueprintSetter = SetInventorySize)
 	int32 InventorySize = 0;
 	
-	UPROPERTY(BlueprintGetter = GetMaxInventorySize, BlueprintSetter = SetMaxInventorySize, meta = (AllowPrivateAccess = "true"))
-	int32 MaxInventorySize = 20;
+	UPROPERTY(BlueprintGetter = GetMaxInventorySize, BlueprintSetter = SetMaxInventorySize)
+	int32 MaxInventorySize = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (RequiredAssetDataTags="RowStructure=/Script/InteractionSystemPlugin.InventoryItemInfo", AllowPrivateAccess = "true"))
 	UDataTable* InventoryInfoTable;
@@ -47,12 +48,12 @@ private:
 	FOnAddItem AddItemDelegate;
 	FOnRemoveItem RemoveItemDelegate;
 	FOnInventoryPressed InventoryPressedDelegate;
+	FOnInventorySizeChanged InventorySizeChangedDelegate;
+	FOnMaxInventorySizeChanged MaxInventorySizeChangedDelegate;
 	
 public:
 	// Sets default values for this component's properties
 	UInventorySystemComponent();
-
-	~UInventorySystemComponent();
 
 protected:
 	// Called when the game starts
@@ -116,6 +117,10 @@ public:
 	
 	FOnInventoryPressed* GetInventoryPressedDelegate() { return &InventoryPressedDelegate; }
 
+	FOnInventorySizeChanged* GetInventorySizeChangedDelegate() { return &InventorySizeChangedDelegate; }
+	
+	FOnMaxInventorySizeChanged* GetMaxInventorySizeChangedDelegate() { return &MaxInventorySizeChangedDelegate; }
+	
 public:
 
 	UFUNCTION(BlueprintGetter)
@@ -126,6 +131,12 @@ public:
 
 public:
 
+	UFUNCTION(BlueprintCallable)
+	void IncreaseInventorySize(const int32 InSize);
+
+	UFUNCTION(BlueprintCallable)
+	void DecreaseInventorySize(const int32 InSize);
+	
 	UFUNCTION(BlueprintSetter)
 	void SetInventorySize(const int32 InSize);
 
