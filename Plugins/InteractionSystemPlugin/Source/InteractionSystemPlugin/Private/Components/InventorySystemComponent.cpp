@@ -270,7 +270,7 @@ const TMap<FName, int32>& UInventorySystemComponent::GetInventory() const
 
 FInventoryItemInfo* UInventorySystemComponent::GetInventoryItemInfo(const FName RowName) const
 {
-	return InventoryInfoTable->FindRow<FInventoryItemInfo>(RowName, TEXT("GetInventoryItemInfo in InventorySt=ystemComponent"));
+	return InventoryInfoTable->FindRow<FInventoryItemInfo>(RowName, TEXT("GetInventoryItemInfo in InventorySystemComponent"));
 }
 
 TArray<FInventoryItemInfo*> UInventorySystemComponent::GetInventoryItemsInfo() const

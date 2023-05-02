@@ -8,6 +8,7 @@
 #include "Interface/InteractableInterface.h"
 #include "Interactable.generated.h"
 
+struct FInventoryItemInfo;
 class UWidgetComponent;
 
 UCLASS()
@@ -18,6 +19,8 @@ class INTERACTIONSYSTEMPLUGIN_API AInteractable : public AActor, public IInterac
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (RowType="/Script/InteractionSystemPlugin.InventoryItemInfo", AllowPrivateAccess = "true"))
 	FDataTableRowHandle ItemInfo;
+
+	FInventoryItemInfo* ItemData;
 	
 public:
 	// Sets default values for this actor's properties
@@ -28,6 +31,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	void UpdateItemData();
 
 public:
 	// Called every frame
@@ -36,23 +40,18 @@ public:
 public:
 	virtual FName GetItemId_Implementation() override;
 	
+	virtual FName GetItemDescription_Implementation() override;
+	
+	virtual FName GetItemName_Implementation() override;
+	
+	virtual int32 GetItemWeight_Implementation() override;
+
 	virtual void OnInteract_Implementation(AActor* Caller) override;
 	
 	virtual void BeginFocus_Implementation(AActor* Caller) override;
 	
 	virtual void EndFocus_Implementation(AActor* Caller) override;
 
-public:
-	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
-	FName GetItemId();
-	
-	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
-	void OnInteract(AActor* Caller);
-	
-	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
-	void BeginFocus(AActor* Caller);
-	
-	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
-	void EndFocus(AActor* Caller);
+	virtual bool CanInteract_Implementation(AActor* Caller) override;
 
 };

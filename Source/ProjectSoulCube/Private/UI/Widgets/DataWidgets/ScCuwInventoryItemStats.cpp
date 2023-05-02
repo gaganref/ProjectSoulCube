@@ -3,6 +3,7 @@
 
 #include "UI/Widgets/DataWidgets/ScCuwInventoryItemStats.h"
 
+#include "Components/RichTextBlock.h"
 #include "Components/TextBlock.h"
 #include "UI/Widgets/Buttons/ScCuwTextButton.h"
 
@@ -10,8 +11,10 @@ void UScCuwInventoryItemStats::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 
-	SetItemName(ItemName);
-	SetItemQuantity(ItemQuantity);
+	SetItemName(TEXT("Default"));
+	SetItemQuantity(5);
+	SetItemWeight(3);
+	SetItemDescription(TEXT("Use this Item to gain 10 health"));
 }
 
 void UScCuwInventoryItemStats::NativeConstruct()
@@ -68,6 +71,16 @@ int32 UScCuwInventoryItemStats::GetItemQuantity() const
 	return ItemQuantity;
 }
 
+int32 UScCuwInventoryItemStats::GetItemWeight() const
+{
+	return ItemWeight;
+}
+
+FName UScCuwInventoryItemStats::GetItemDescription() const
+{
+	return ItemDescription;
+}
+
 UScCuwInventoryItem* UScCuwInventoryItemStats::GetParentItemRef() const
 {
 	return ParentItemRef;
@@ -109,4 +122,22 @@ void UScCuwInventoryItemStats::SetItemQuantity(const int32 NewQuantity)
 void UScCuwInventoryItemStats::SetParentItemRef(UScCuwInventoryItem* InItem)
 {
 	ParentItemRef = InItem;
+}
+
+void UScCuwInventoryItemStats::SetItemWeight(const int32 NewWeight)
+{
+	if(ItemWeightBlock)
+	{
+		ItemWeight = NewWeight;
+		ItemWeightBlock->SetText(FText::FromString(FString::FromInt(ItemWeight)));
+	}
+}
+
+void UScCuwInventoryItemStats::SetItemDescription(const FName NewDescription)
+{
+	if(ItemDescriptionBlock)
+	{
+		ItemDescription = NewDescription;
+		ItemDescriptionBlock->SetText(FText::FromName(NewDescription));
+	}
 }

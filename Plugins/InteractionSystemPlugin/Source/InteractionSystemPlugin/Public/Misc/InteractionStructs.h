@@ -22,8 +22,11 @@ struct FInventoryItemInfo : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 ItemWeight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FName ItemDescription;
 	
-	FInventoryItemInfo() : ItemName("Default"), Thumbnail(nullptr), ItemClass(nullptr), ItemWeight(1)
+	FInventoryItemInfo() : ItemName("Default"), Thumbnail(nullptr), ItemClass(nullptr), ItemWeight(1), ItemDescription("Item Description")
 	{
 	}
 };

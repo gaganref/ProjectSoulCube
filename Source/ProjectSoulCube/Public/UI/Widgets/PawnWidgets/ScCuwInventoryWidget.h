@@ -94,7 +94,7 @@ public:
 
 public:
 	// Getters
-
+	
 	UFUNCTION(BlueprintGetter)
 	int32 GetInventorySize() const;
 

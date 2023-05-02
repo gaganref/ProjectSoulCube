@@ -9,7 +9,7 @@
 struct FDataTableRowHandle;
 // This class does not need to be modified.
 UINTERFACE()
-class UInteractableInterface : public UInterface
+class INTERACTIONSYSTEMPLUGIN_API UInteractableInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -25,6 +25,15 @@ class INTERACTIONSYSTEMPLUGIN_API IInteractableInterface
 public:
 	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
 	FName GetItemId();
+
+	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
+	FName GetItemName();
+	
+	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
+	int32 GetItemWeight();
+
+	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
+	FName GetItemDescription();
 	
 	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
 	void OnInteract(AActor* Caller);

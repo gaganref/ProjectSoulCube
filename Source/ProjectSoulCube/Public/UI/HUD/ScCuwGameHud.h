@@ -30,6 +30,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	FKey ToggleInventorySecondaryKey = EKeys::Escape;
+
+	UPROPERTY()
+	bool bIsInventoryOpen = false;
+
+	UPROPERTY()
+	bool bIsItemHelpTextOpen = false;
 	
 protected:
 	virtual void NativePreConstruct() override;
@@ -44,6 +50,9 @@ protected:
 
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
+	UFUNCTION()
+	void HandleToggleInventory(const bool bShouldOpenInventory);
+	
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnInit(AController* Controller);

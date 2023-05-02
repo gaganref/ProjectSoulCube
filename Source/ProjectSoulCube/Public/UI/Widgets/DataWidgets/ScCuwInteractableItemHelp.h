@@ -18,11 +18,23 @@ private:
 	UPROPERTY(BlueprintGetter = GetItemName, BlueprintSetter = SetItemName, meta = (BindWidget))
 	FName ItemName;
 
+	UPROPERTY(BlueprintGetter = GetItemWeight, BlueprintSetter = SetItemWeight)
+	int32 ItemWeight;
+
+	UPROPERTY(BlueprintGetter = GetItemDescription, BlueprintSetter = SetItemDescription)
+	FName ItemDescription;
+	
 	UPROPERTY(BlueprintGetter = GetParentItemRef, BlueprintSetter = SetParentItemRef)
 	TObjectPtr<class AActor> ParentItemRef;
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> ItemNameBlock;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTextBlock> ItemWeightBlock;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class URichTextBlock> ItemDescriptionBlock;
 
 protected:
 	virtual void NativePreConstruct() override;
@@ -32,12 +44,24 @@ public:
 	FName GetItemName() const;
 
 	UFUNCTION(BlueprintGetter)
+	int32 GetItemWeight() const;
+
+	UFUNCTION(BlueprintGetter)
+	FName GetItemDescription() const;
+	
+	UFUNCTION(BlueprintGetter)
 	class AActor* GetParentItemRef() const;
 
 	
 public:
 	UFUNCTION(BlueprintSetter)
 	void SetItemName(const FName NewName);
+
+	UFUNCTION(BlueprintSetter)
+	void SetItemWeight(const int32 NewWeight);
+
+	UFUNCTION(BlueprintSetter)
+	void SetItemDescription(const FName NewDescription);
 	
 	UFUNCTION(BlueprintSetter)
 	void SetParentItemRef(AActor* InItem);

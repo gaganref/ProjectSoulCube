@@ -452,12 +452,10 @@ void APlayerCharacter::SendAbilityLocalInput(const FInputActionValue& InActionVa
 
 	if(InActionValue.Get<bool>())
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s Pressed"), *UEnum::GetValueAsString(InInputId));
 		AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(InInputId));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s Released"), *UEnum::GetValueAsString(InInputId));
 		AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(InInputId));
 	}
 }

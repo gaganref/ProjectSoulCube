@@ -19,20 +19,33 @@ class PROJECTSOULCUBE_API UScCuwInventoryItemStats : public UScCommonUserWidget
 	GENERATED_BODY()
 
 private:
-	UPROPERTY(BlueprintGetter = GetItemName, BlueprintSetter = SetItemName, meta = (BindWidget))
+	UPROPERTY(BlueprintGetter = GetItemName, BlueprintSetter = SetItemName)
 	FName ItemName;
 
 	UPROPERTY(BlueprintGetter = GetItemQuantity, BlueprintSetter = SetItemQuantity)
 	int32 ItemQuantity;
+	
+	UPROPERTY(BlueprintGetter = GetItemWeight, BlueprintSetter = SetItemWeight)
+	int32 ItemWeight;
 
+	UPROPERTY(BlueprintGetter = GetItemDescription, BlueprintSetter = SetItemDescription)
+	FName ItemDescription;
+	
 	UPROPERTY(BlueprintGetter = GetParentItemRef, BlueprintSetter = SetParentItemRef)
 	TObjectPtr<class UScCuwInventoryItem> ParentItemRef;
-	
+
+private:	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> ItemNameBlock;
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> ItemQuantityBlock;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTextBlock> ItemWeightBlock;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class URichTextBlock> ItemDescriptionBlock;
 
 	UPROPERTY(BlueprintGetter = GetItemUseButton, meta = (BindWidget))
 	TObjectPtr<class UScCuwTextButton> ItemUseButton;
@@ -69,6 +82,12 @@ public:
 	int32 GetItemQuantity() const;
 
 	UFUNCTION(BlueprintGetter)
+	int32 GetItemWeight() const;
+
+	UFUNCTION(BlueprintGetter)
+	FName GetItemDescription() const;
+
+	UFUNCTION(BlueprintGetter)
 	class UScCuwInventoryItem* GetParentItemRef() const;
 
 	UFUNCTION(BlueprintGetter)
@@ -94,6 +113,12 @@ public:
 	void SetItemQuantity(const int32 NewQuantity);
 
 	UFUNCTION(BlueprintSetter)
-	void SetParentItemRef(UScCuwInventoryItem* InItem);
+	void SetParentItemRef(class UScCuwInventoryItem* InItem);
+
+	UFUNCTION(BlueprintSetter)
+	void SetItemWeight(const int32 NewWeight);
+
+	UFUNCTION(BlueprintSetter)
+	void SetItemDescription(const FName NewDescription);
 	
 };

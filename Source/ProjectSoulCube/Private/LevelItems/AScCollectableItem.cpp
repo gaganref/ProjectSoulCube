@@ -5,12 +5,14 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
+#include "DebugLibraryCommon.h"
 #include "Components/InterpToMovementComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/HUD.h"
 #include "GameFramework/RotatingMovementComponent.h"
 #include "GAS/GameplayEffects/SCGameplayEffect.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/InteractionStructs.h"
 #include "UI/Interface/InteractableItemHudInterface.h"
 
 
@@ -42,7 +44,13 @@ void AAScCollectableItem::OnConstruction(const FTransform& Transform)
 void AAScCollectableItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	UpdateItemInfoData();
+}
+
+void AAScCollectableItem::UpdateItemInfoData()
+{
+	ItemInfoData = ItemInfo.GetRow<FInventoryItemInfo>(TEXT("BeginPlay in AInteractable"));
 }
 
 void AAScCollectableItem::AdjustInteractablePosition()
@@ -70,6 +78,36 @@ void AAScCollectableItem::Tick(float DeltaTime)
 FName AAScCollectableItem::GetItemId_Implementation()
 {
 	return ItemInfo.RowName;
+}
+
+FName AAScCollectableItem::GetItemDescription_Implementation()
+{
+	if(!ItemInfoData)
+	{
+		return TEXT("NONE");
+	}
+	
+	return ItemInfoData->ItemDescription;
+}
+
+FName AAScCollectableItem::GetItemName_Implementation()
+{
+	if(!ItemInfoData)
+	{
+		return TEXT("NONE");
+	}
+	
+	return ItemInfoData->ItemName;
+}
+
+int32 AAScCollectableItem::GetItemWeight_Implementation()
+{
+	if(!ItemInfoData)
+	{
+		return -1;
+	}
+	
+	return ItemInfoData->ItemWeight;
 }
 
 void AAScCollectableItem::OnInteract_Implementation(AActor* Caller)
@@ -101,7 +139,7 @@ void AAScCollectableItem::OnInteract_Implementation(AActor* Caller)
 	
 	const FGameplayEffectContextHandle GameplayEffectContextHandle;
 	AscRef->ApplyGameplayEffectToSelf(ItemGameplayAffect, 0.0f, GameplayEffectContextHandle);
-
+	
 	// Only Destroy the actor if it is placed in the level
 	if(GetWorld() != NULL)
 	{

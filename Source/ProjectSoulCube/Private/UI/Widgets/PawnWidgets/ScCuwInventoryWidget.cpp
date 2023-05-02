@@ -74,7 +74,7 @@ void UScCuwInventoryWidget::OnInit_Implementation(AController* Controller)
 		
 		InventoryRef->GetAddItemDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleInventoryItemAdd);
 		InventoryRef->GetRemoveItemDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleInventoryItemRemove);
-		InventoryRef->GetInventoryPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleToggleInventory);
+		// InventoryRef->GetInventoryPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleToggleInventory);
 		InventoryRef->GetInventorySizeChangedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleInventorySizeChanged);
 		InventoryRef->GetMaxInventorySizeChangedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleMaxInventorySizeChanged);
 	}
@@ -158,6 +158,8 @@ void UScCuwInventoryWidget::HandleInventoryItemButtonClicked(UScCuwInventoryItem
 	InventoryItemStats->SetParentItemRef(ItemReference);
 	InventoryItemStats->SetItemName(ItemInfo->ItemName);
 	InventoryItemStats->SetItemQuantity(ItemReference->GetItemQuantity());
+	InventoryItemStats->SetItemWeight(ItemInfo->ItemWeight);
+	InventoryItemStats->SetItemDescription(ItemInfo->ItemDescription);
 	
 	InventoryItemStats->SetVisibility(ESlateVisibility::Visible);
 }

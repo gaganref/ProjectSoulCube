@@ -41,6 +41,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (RowType="/Script/InteractionSystemPlugin.InventoryItemInfo", AllowPrivateAccess = "true"))
 	FDataTableRowHandle ItemInfo;
 	
+	FInventoryItemInfo* ItemInfoData;
+	
 public:
 	// Sets default values for this actor's properties
 	AAScCollectableItem();
@@ -50,6 +52,8 @@ protected:
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	void UpdateItemInfoData();
 	
 	// To make sure that the interactable is above the origin of the actor.
 	virtual void AdjustInteractablePosition();
@@ -61,29 +65,19 @@ public:
 public:
 	virtual FName GetItemId_Implementation() override;
 	
-	virtual void OnInteract_Implementation(AActor* Caller) override;
+	virtual FName GetItemDescription_Implementation() override;
+	
+	virtual FName GetItemName_Implementation() override;
+	
+	virtual int32 GetItemWeight_Implementation() override;
 
+	virtual void OnInteract_Implementation(AActor* Caller) override;
+	
 	virtual void BeginFocus_Implementation(AActor* Caller) override;
 	
 	virtual void EndFocus_Implementation(AActor* Caller) override;
 
 	virtual bool CanInteract_Implementation(AActor* Caller) override;
-
-public:
-	UFUNCTION(Category = "Interactables|CollectableItem", BlueprintNativeEvent, BlueprintCallable)
-	FName GetItemId();
-	
-	UFUNCTION(Category = "Interactables|CollectableItem", BlueprintNativeEvent, BlueprintCallable)
-	void OnInteract(AActor* Caller);
-	
-	UFUNCTION(Category = "Interactables|CollectableItem", BlueprintNativeEvent, BlueprintCallable)
-	void BeginFocus(AActor* Caller);
-	
-	UFUNCTION(Category = "Interactables|CollectableItem", BlueprintNativeEvent, BlueprintCallable)
-	void EndFocus(AActor* Caller);
-
-	UFUNCTION(Category = "InteractionSystem|Interactables", BlueprintNativeEvent, BlueprintCallable)
-	bool CanInteract(AActor* Caller);
 
 public:
 	FORCEINLINE UStaticMeshComponent* GetInteractableMesh() const { return InteractableMesh; }
