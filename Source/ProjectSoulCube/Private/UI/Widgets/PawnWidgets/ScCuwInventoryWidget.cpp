@@ -74,13 +74,14 @@ void UScCuwInventoryWidget::OnInit_Implementation(AController* Controller)
 		
 		InventoryRef->GetAddItemDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleInventoryItemAdd);
 		InventoryRef->GetRemoveItemDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleInventoryItemRemove);
-		// InventoryRef->GetInventoryPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleToggleInventory);
 		InventoryRef->GetInventorySizeChangedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleInventorySizeChanged);
 		InventoryRef->GetMaxInventorySizeChangedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleMaxInventorySizeChanged);
+		InventoryRef->GetRequestOfferItemDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleRequestOfferItem);
 	}
 
 	if(InventoryItemStats)
 	{
+		InventoryItemStats->GetItemOfferButtonPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleItemOfferButtonPressed);
 		InventoryItemStats->GetItemUseButtonPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleItemUseButtonPressed);
 		InventoryItemStats->GetItemDropButtonPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleItemDropButtonPressed);
 		InventoryItemStats->GetItemCancelButtonPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryWidget::HandleItemCancelButtonPressed);
@@ -111,20 +112,6 @@ void UScCuwInventoryWidget::HandleInventoryItemRemove(const FName RowId, const i
 	SetInventoryItemVisibility(ItemWidget, ItemQuantity);
 }
 
-void UScCuwInventoryWidget::HandleToggleInventory(const bool bShouldOpenInventory)
-{
-	if(bShouldOpenInventory)
-	{
-		SetVisibility(ESlateVisibility::Visible);
-	}
-	else
-	{
-		SetVisibility(ESlateVisibility::Collapsed);
-	}
-
-	InventoryItemStats->SetVisibility(ESlateVisibility::Collapsed);
-}
-
 void UScCuwInventoryWidget::HandleInventorySizeChanged(const int32 NewSize)
 {
 	SetInventorySize(NewSize);
@@ -135,6 +122,14 @@ void UScCuwInventoryWidget::HandleMaxInventorySizeChanged(const int32 NewSize)
 {
 	SetMaxInventorySize(NewSize);
 	UpdateInventorySizeText();
+}
+
+void UScCuwInventoryWidget::HandleRequestOfferItem(const bool bShouldOpen)
+{
+	if(InventoryItemStats)
+	{
+		InventoryItemStats->ToggleItemOfferButton(bShouldOpen);	
+	}
 }
 
 void UScCuwInventoryWidget::HandleInventoryItemButtonClicked(UScCuwInventoryItem* ItemReference)
@@ -174,6 +169,19 @@ void UScCuwInventoryWidget::SetInventoryItemVisibility(UScCuwInventoryItem* Item
 	{
 		ItemWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
+}
+
+void UScCuwInventoryWidget::HandleItemOfferButtonPressed(UScCuwInventoryItem* ItemReference)
+{
+	if(!InventoryRef)
+	{
+		return;
+	}
+
+	FName RowName = *InventoryItems.FindKey(ItemReference);
+	InventoryRef->OfferInventoryItem(RowName);
+	
+	InventoryItemStats->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void UScCuwInventoryWidget::HandleItemUseButtonPressed(UScCuwInventoryItem* ItemReference)

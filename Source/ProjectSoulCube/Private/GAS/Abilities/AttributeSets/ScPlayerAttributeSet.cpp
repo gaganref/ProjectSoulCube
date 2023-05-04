@@ -45,8 +45,7 @@ void UScPlayerAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 		// Store a local copy of the amount of damage done and clear the damage attribute
 		const float LocalDamageDone = GetDamage();
 		SetDamage(0.f);
-
-		UE_LOG(LogTemp, Warning, TEXT("Yes Damage"));
+		
 		if (LocalDamageDone > 0.0f)
 		{
 			if (!TargetCharacter->IsAlive())

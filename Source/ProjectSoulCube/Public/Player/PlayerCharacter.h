@@ -168,7 +168,7 @@ protected:
 
 protected:
 
-	virtual void Die();
+	virtual void BeginDie();
 	
 	virtual void PossessedBy(AController* NewController) override;
 
@@ -196,6 +196,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void StopSprinting();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void Die();
 	
 public:
 

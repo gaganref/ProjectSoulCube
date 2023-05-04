@@ -63,10 +63,7 @@ protected:
 	
 	UFUNCTION()
 	void HandleInventoryItemRemove(const FName RowId, const int32 ItemQuantity);
-
-	UFUNCTION()
-	void HandleToggleInventory(const bool bShouldOpenInventory);
-
+	
 	UFUNCTION()
 	void HandleInventorySizeChanged(const int32 NewSize);
 
@@ -74,11 +71,17 @@ protected:
 	void HandleMaxInventorySizeChanged(const int32 NewSize);
 
 	UFUNCTION()
+	void HandleRequestOfferItem(const bool bShouldOpen);
+
+	UFUNCTION()
 	void HandleInventoryItemButtonClicked(UScCuwInventoryItem* ItemReference);
 
 	UFUNCTION()
 	static void SetInventoryItemVisibility(UScCuwInventoryItem* ItemWidget, const int32 ItemQuantity);
 
+	UFUNCTION()
+	void HandleItemOfferButtonPressed(UScCuwInventoryItem* ItemReference);
+	
 	UFUNCTION()
 	void HandleItemUseButtonPressed(UScCuwInventoryItem* ItemReference);
 

@@ -5,9 +5,7 @@
 
 #include "Interface/InteractableInterface.h"
 #include "..\..\Public\Misc\InteractionStructs.h"
-#include "Interface/InventoryInterface.h"
-#include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
+#include "Interface/ItemsAlterInterface.h"
 
 
 // Sets default values for this component's properties
@@ -38,9 +36,12 @@ void UInventorySystemComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
-	for(auto It : Inventory)
+	if(bDebug)
 	{
-		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Blue, FString::Printf(TEXT("Item - %s :: Quamtity - %s."), *It.Key.ToString(), *FString::FromInt(It.Value)));
+		for(auto It : Inventory)
+		{
+			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Blue, FString::Printf(TEXT("Item - %s :: Quamtity - %s."), *It.Key.ToString(), *FString::FromInt(It.Value)));
+		}
 	}
 }
 
@@ -104,6 +105,32 @@ bool UInventorySystemComponent::RemoveItemByItemRowName(FName ItemRow)
 	return true;
 }
 
+void UInventorySystemComponent::OfferInventoryItem(FName ItemRow)
+{
+	if(!OwnerPawn || !AlterRef)
+	{
+		return;
+	}
+	
+	FInventoryItemInfo* Item = GetInventoryItemInfo(ItemRow);
+	if(!Item)
+	{
+		return;
+	}
+	if(!Item->ItemClass)
+	{
+		return;
+	}
+    if(AlterRef->GetClass()->ImplementsInterface(UItemsAlterInterface::StaticClass()))
+    {
+    	const int32 ItemWeightRef = Item->ItemWeight;
+    	if(RemoveItemByItemRowName(ItemRow))
+    	{
+    		IItemsAlterInterface::Execute_HandleItemOffering(AlterRef, ItemWeightRef);
+    	}
+    }
+}
+
 void UInventorySystemComponent::UseInventoryItem(FName ItemRow)
 {
 	if(!OwnerPawn)
@@ -136,9 +163,9 @@ void UInventorySystemComponent::UseInventoryItem(FName ItemRow)
 	}
 
 	IInteractableInterface::Execute_OnInteract(ItemActor, OwnerPawn);
-	if(RemoveItemByItemRowName(ItemRow))
+	if(!RemoveItemByItemRowName(ItemRow))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("placeHolder for Use Item"));
+		UE_LOG(LogTemp, Warning, TEXT("Remove Item Failed"));
 	}
 }
 
@@ -192,6 +219,31 @@ bool UInventorySystemComponent::CanAddItem(AActor* Actor)
 	}
 	
 	return true;
+}
+
+void UInventorySystemComponent::RequestBeginItemOfferings(AActor* Actor)
+{
+	if(!Actor)
+	{
+		return;
+	}
+	if(Actor->GetClass()->ImplementsInterface(UItemsAlterInterface::StaticClass()))
+	{
+		AlterRef = Actor;
+		if(RequestOfferItemDelegate.IsBound())
+		{
+			RequestOfferItemDelegate.Broadcast(true);
+		}
+	}
+}
+
+void UInventorySystemComponent::RequestEndItemOfferings()
+{
+	AlterRef = nullptr;
+	if(RequestOfferItemDelegate.IsBound())
+	{
+		RequestOfferItemDelegate.Broadcast(false);
+	}
 }
 
 void UInventorySystemComponent::FetchInventoryTableDataToInventoryMap()
@@ -298,6 +350,11 @@ int32 UInventorySystemComponent::GetInventorySize()
 int32 UInventorySystemComponent::GetMaxInventorySize()
 {
 	return MaxInventorySize;
+}
+
+bool UInventorySystemComponent::GetIsInventoryOpen() const
+{
+	return bIsInventoryOpen;
 }
 
 void UInventorySystemComponent::IncreaseInventorySize(const int32 InSize)

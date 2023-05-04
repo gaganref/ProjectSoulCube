@@ -12,6 +12,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRemoveItem, const FName, ItemRow
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryPressed, const bool, bShouldOpenInventory);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventorySizeChanged, const int32, NewSize);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxInventorySizeChanged, const int32, NewSize);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRequestOfferItem, const bool, bShouldOpen);
 
 class UDataTable;
 struct FInventoryItemInfo;
@@ -32,8 +33,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (RequiredAssetDataTags="RowStructure=/Script/InteractionSystemPlugin.InventoryItemInfo", AllowPrivateAccess = "true"))
 	UDataTable* InventoryInfoTable;
-	
-	// TMap<FInventoryItemInfo*, int32> Inventory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool bDebug = false;
 
 	UPROPERTY()
 	TMap<FName, int32> Inventory;
@@ -41,6 +43,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<APawn> OwnerPawn;
 
+	UPROPERTY()
+	TObjectPtr<AActor> AlterRef;
+	
 	UPROPERTY()
 	bool bIsInventoryOpen = false;
 
@@ -50,6 +55,7 @@ private:
 	FOnInventoryPressed InventoryPressedDelegate;
 	FOnInventorySizeChanged InventorySizeChangedDelegate;
 	FOnMaxInventorySizeChanged MaxInventorySizeChangedDelegate;
+	FOnRequestOfferItem RequestOfferItemDelegate;
 	
 public:
 	// Sets default values for this component's properties
@@ -83,6 +89,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool RemoveItemByItemRowName(FName ItemRow);
+
+	//	Offers the item to the possible alter and Removes the item from the inventory array.
+	UFUNCTION(BlueprintCallable)
+	void OfferInventoryItem(FName ItemRow);
 	
 	// Removes the item from the inventory array using the item.
 	UFUNCTION(BlueprintCallable)
@@ -96,6 +106,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool CanAddItem(AActor* Actor);
 
+	UFUNCTION(BlueprintCallable)
+	void RequestBeginItemOfferings(AActor* Actor);
+
+	UFUNCTION(BlueprintCallable)
+	void RequestEndItemOfferings();
+	
 	// Get item info from data table.
 	UFUNCTION(BlueprintCallable)
 	bool FetchItemDataReferenceFromTable(AActor* Actor, FInventoryItemInfo& OutItemInfo) const;
@@ -120,6 +136,8 @@ public:
 	FOnInventorySizeChanged* GetInventorySizeChangedDelegate() { return &InventorySizeChangedDelegate; }
 	
 	FOnMaxInventorySizeChanged* GetMaxInventorySizeChangedDelegate() { return &MaxInventorySizeChangedDelegate; }
+
+	FOnRequestOfferItem* GetRequestOfferItemDelegate() { return &RequestOfferItemDelegate; }
 	
 public:
 
@@ -128,6 +146,9 @@ public:
 
 	UFUNCTION(BlueprintGetter)
 	int32 GetMaxInventorySize();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetIsInventoryOpen() const;
 
 public:
 

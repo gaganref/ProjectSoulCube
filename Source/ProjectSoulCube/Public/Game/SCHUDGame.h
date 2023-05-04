@@ -53,12 +53,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnInventoryPressed(const bool bShouldOpenInventory);
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void ShowItemInfo(AActor* InteractableRef);
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void HideItemInfo(AActor* InteractableRef);
-	
 public:
 	UFUNCTION(BlueprintGetter)
 	class UScCuwGameHud* GetHudWidget() const;

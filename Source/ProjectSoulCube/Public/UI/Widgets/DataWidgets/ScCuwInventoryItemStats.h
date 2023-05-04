@@ -6,6 +6,7 @@
 #include "UI/Widgets/ScCommonUserWidget.h"
 #include "ScCuwInventoryItemStats.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemOfferButtonPressed, UScCuwInventoryItem*, ItemReference);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemUseButtonPressed, UScCuwInventoryItem*, ItemReference);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemDropButtonPressed, UScCuwInventoryItem*, ItemReference);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemCancelButtonPressed, UScCuwInventoryItem*, ItemReference);
@@ -47,6 +48,12 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class URichTextBlock> ItemDescriptionBlock;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UVerticalBox> ItemOfferButtonVerticalBox;
+	
+	UPROPERTY(BlueprintGetter = GetItemOfferButton, meta = (BindWidget))
+	TObjectPtr<class UScCuwTextButton> ItemOfferButton;
+	
 	UPROPERTY(BlueprintGetter = GetItemUseButton, meta = (BindWidget))
 	TObjectPtr<class UScCuwTextButton> ItemUseButton;
 
@@ -56,6 +63,7 @@ private:
 	UPROPERTY(BlueprintGetter = GetItemCancelButton, meta = (BindWidget))
 	TObjectPtr<class UScCuwTextButton> ItemCancelButton;
 
+	FOnItemOfferButtonPressed ItemOfferButtonPressedDelegate;
 	FOnItemUseButtonPressed ItemUseButtonPressedDelegate;
 	FOnItemDropButtonPressed ItemDropButtonPressedDelegate;
 	FOnItemCancelButtonPressed ItemCancelButtonPressedDelegate;
@@ -66,6 +74,9 @@ protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
+	void HandleItemOfferButtonPressed();
+	
+	UFUNCTION()
 	void HandleItemUseButtonPressed();
 
 	UFUNCTION()
@@ -73,6 +84,10 @@ protected:
 
 	UFUNCTION()
 	void HandleItemCancelButtonPressed();
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void ToggleItemOfferButton(const bool bShouldOpen);
 	
 public:
 	UFUNCTION(BlueprintGetter)
@@ -89,7 +104,10 @@ public:
 
 	UFUNCTION(BlueprintGetter)
 	class UScCuwInventoryItem* GetParentItemRef() const;
-
+	
+	UFUNCTION(BlueprintGetter)
+	class UScCuwTextButton* GetItemOfferButton() const;
+	
 	UFUNCTION(BlueprintGetter)
 	class UScCuwTextButton* GetItemUseButton() const;
 
@@ -99,6 +117,8 @@ public:
 	UFUNCTION(BlueprintGetter)
 	class UScCuwTextButton* GetItemCancelButton() const;
 
+	FOnItemOfferButtonPressed* GetItemOfferButtonPressedDelegate() { return &ItemOfferButtonPressedDelegate; }
+	
 	FOnItemUseButtonPressed* GetItemUseButtonPressedDelegate() { return &ItemUseButtonPressedDelegate; }
 	
 	FOnItemDropButtonPressed* GetItemDropButtonPressedDelegate() { return &ItemDropButtonPressedDelegate; }

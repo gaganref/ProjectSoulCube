@@ -13,5 +13,20 @@ UCLASS()
 class PROJECTSOULCUBE_API ADefaultGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
+
+private:
+	UPROPERTY(EditAnywhere)
+	FLinearColor CameraFadeInColor = FLinearColor::Red;
 	
+public:
+
+	virtual void BeginGameWin();
+	
+	virtual void BeginGameLost();
+	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void GameWin();
+	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void GameLost();
 };

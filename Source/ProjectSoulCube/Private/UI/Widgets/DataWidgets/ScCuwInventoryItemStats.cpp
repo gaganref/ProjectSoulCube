@@ -5,12 +5,14 @@
 
 #include "Components/RichTextBlock.h"
 #include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
 #include "UI/Widgets/Buttons/ScCuwTextButton.h"
 
 void UScCuwInventoryItemStats::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 
+	ToggleItemOfferButton(false);
 	SetItemName(TEXT("Default"));
 	SetItemQuantity(5);
 	SetItemWeight(3);
@@ -21,6 +23,12 @@ void UScCuwInventoryItemStats::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	ToggleItemOfferButton(false);
+	
+	if(ItemOfferButton)
+	{
+		ItemOfferButton->GetButtonPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryItemStats::HandleItemOfferButtonPressed);
+	}
 	if(ItemUseButton)
 	{
 		ItemUseButton->GetButtonPressedDelegate()->AddUniqueDynamic(this, &UScCuwInventoryItemStats::HandleItemUseButtonPressed);
@@ -35,6 +43,14 @@ void UScCuwInventoryItemStats::NativeConstruct()
 	}
 
 	SetVisibility(ESlateVisibility::Collapsed);
+}
+
+void UScCuwInventoryItemStats::HandleItemOfferButtonPressed()
+{
+	if(ItemOfferButtonPressedDelegate.IsBound())
+	{
+		ItemOfferButtonPressedDelegate.Broadcast(ParentItemRef);
+	}
 }
 
 void UScCuwInventoryItemStats::HandleItemUseButtonPressed()
@@ -61,6 +77,27 @@ void UScCuwInventoryItemStats::HandleItemCancelButtonPressed()
 	}
 }
 
+void UScCuwInventoryItemStats::ToggleItemOfferButton(const bool bShouldOpen)
+{
+	if(ItemOfferButton && ItemOfferButtonVerticalBox)
+	{
+		if(bShouldOpen)
+		{
+			ItemOfferButton->SetVisibility(ESlateVisibility::Visible);
+			ItemOfferButton->SetIsEnabled(true);
+			ItemOfferButtonVerticalBox->SetVisibility(ESlateVisibility::Visible);
+			ItemOfferButtonVerticalBox->SetIsEnabled(true);
+		}
+		else
+		{
+			ItemOfferButton->SetVisibility(ESlateVisibility::Collapsed);
+			ItemOfferButton->SetIsEnabled(false);
+			ItemOfferButtonVerticalBox->SetVisibility(ESlateVisibility::Collapsed);
+			ItemOfferButtonVerticalBox->SetIsEnabled(false);
+		}
+	}
+}
+
 FName UScCuwInventoryItemStats::GetItemName() const
 {
 	return ItemName;
@@ -84,6 +121,11 @@ FName UScCuwInventoryItemStats::GetItemDescription() const
 UScCuwInventoryItem* UScCuwInventoryItemStats::GetParentItemRef() const
 {
 	return ParentItemRef;
+}
+
+UScCuwTextButton* UScCuwInventoryItemStats::GetItemOfferButton() const
+{
+	return ItemOfferButton;
 }
 
 UScCuwTextButton* UScCuwInventoryItemStats::GetItemUseButton() const

@@ -12,6 +12,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/InteractionDetectionComponent.h"
 #include "Components/InventorySystemComponent.h"
+#include "Game/DefaultGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GAS/SCAbilitySystemComponent.h"
@@ -19,6 +20,7 @@
 #include "GAS/Abilities/AttributeSets/SCHealthAttributeSet.h"
 #include "GAS/Abilities/AttributeSets/ScPlayerAttributeSet.h"
 #include "GAS/GameplayEffects/SCGameplayEffect.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/SCPlayerState.h"
 #include "ProjectSoulCube/ProjectSoulCube.h"
 
@@ -104,21 +106,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			EnhancedInputComponent->BindAction(InputActionSprint, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleSprint);
 		}
 	}
-	
-	// // Bind to AbilitySystemComponent
-	// // Not Required because we are emulating and using local input
-	// AbilitySystemComponent->BindAbilityActivationToInputComponent
-	// (
-	// 	PlayerInputComponent,
-	// 	FGameplayAbilityInputBinds
-	// 	(
-	// 		FString("ConfirmTarget"),
-	// 		FString("CancelTarget"),
-	// 		FString("ESCAbilityInputID"),
-	// 		static_cast<int32>(ESCAbilityInputID::Confirm),	// need to be in both enum and project input actions
-	// 		static_cast<int32>(ESCAbilityInputID::Cancel)
-	// 	)
-	// );
 }
 
 void APlayerCharacter::InitializeCustomCamera()
@@ -210,6 +197,12 @@ void APlayerCharacter::HandleItemUse(const FInputActionValue& ActionValue)
 void APlayerCharacter::HandleInventory(const FInputActionValue& ActionValue)
 {
 	InventorySystemComponent->ToggleInventory();
+	
+	//TODO: Use Different Method
+	if(!InventorySystemComponent->GetIsInventoryOpen())
+	{
+		AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(ESCAbilityInputID::Sprint));	
+	}
 }
 
 void APlayerCharacter::HandleSprint(const FInputActionValue& ActionValue)
@@ -227,7 +220,7 @@ void APlayerCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
 	// If the player died, handle death
 	if (!IsAlive() && !AbilitySystemComponent->HasMatchingGameplayTag(DeadTag))
 	{
-		Die();
+		BeginDie();
 	}
 }
 
@@ -271,7 +264,7 @@ void APlayerCharacter::StopSprinting()
 	}
 }
 
-void APlayerCharacter::Die()
+void APlayerCharacter::BeginDie()
 {
 	// TODO: Handle death
 	RemoveCharacterAbilities();
@@ -285,15 +278,16 @@ void APlayerCharacter::Die()
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->CancelAllAbilities();
-	
-		// FGameplayTagContainer EffectTagsToRemove;
-		// EffectTagsToRemove.AddTag(EffectRemoveOnDeathTag);
-		// int32 NumEffectsRemoved = AbilitySystemComponent->RemoveActiveEffectsWithTags(EffectTagsToRemove);
-	
 		AbilitySystemComponent->AddLooseGameplayTag(DeadTag);
 	}
 
-	Destroy();
+	TObjectPtr<ADefaultGameMode> GameModeRef = Cast<ADefaultGameMode>(UGameplayStatics::GetGameMode(this));
+	if(GameModeRef)
+	{
+		GameModeRef->BeginGameLost();
+	}
+
+	Die();
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -397,12 +391,6 @@ void APlayerCharacter::AddCharacterAbilities()
 			)
 	);
 	
-	// for (TSubclassOf<USCGameplayAbility>& StartupAbility : CharacterAbilities)
-	// {
-	// 	AbilitySystemComponent->GiveAbility(
-	// 		FGameplayAbilitySpec(StartupAbility, GetAbilityLevel(StartupAbility.GetDefaultObject()->AbilityID), static_cast<int32>(StartupAbility.GetDefaultObject()->AbilityInputID), this));
-	// }
-
 	AbilitySystemComponent->SetCharacterAbilitiesGiven(true);
 }
 
@@ -414,14 +402,6 @@ void APlayerCharacter::RemoveCharacterAbilities()
 	}
 
 	TArray<FGameplayAbilitySpecHandle> AbilitiesToRemove;
-	
-	// for (const FGameplayAbilitySpec& Spec : AbilitySystemComponent->GetActivatableAbilities())
-	// {
-	// 	if ((Spec.SourceObject == this) && CharacterAbilities.Contains(Spec.Ability->GetClass()))
-	// 	{
-	// 		AbilitiesToRemove.Add(Spec.Handle);
-	// 	}
-	// }
 
 	for (const FGameplayAbilitySpec& Spec : AbilitySystemComponent->GetActivatableAbilities())
 	{
