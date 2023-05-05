@@ -33,7 +33,7 @@ public class ProjectSoulCube : ModuleRules
 				"GameplayTags", 
 				"GameplayTasks",
 				"Slate",
-				"SlateCore"
+				"SlateCore", "MoviePlayer"
 				// ... add private dependencies that you statically link with here ...	
 			}
 		);
