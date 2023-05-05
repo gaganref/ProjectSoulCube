@@ -12,6 +12,8 @@
 #include "Interface/PlayerStatsInterface.h"
 #include "PlayerCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPauseMenuPressed);
+
 enum class ESCAbilityInputID : uint8;
 struct FOnAttributeChangeData;
 class UInputAction;
@@ -85,6 +87,9 @@ private:
 	UPROPERTY(Category = "Input", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UInputAction> InputActionSprint;
 
+	UPROPERTY(Category = "Input", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UInputAction> InputActionPauseMenu;
+
 protected:
 
 	UPROPERTY(Category = "Ability System", EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "1", ClampMax = "5"))
@@ -124,6 +129,8 @@ protected:
 
 protected:
 	FGameplayTag DeadTag;
+
+	FOnPauseMenuPressed PauseMenuPressedDelegate;
 	
 protected:
 
@@ -138,6 +145,8 @@ protected:
 
 	
 public:
+	
+	FOnPauseMenuPressed* GetPauseMenuPressedDelegate() { return &PauseMenuPressedDelegate; }
 	
 	/** Returns Follow Camera */
 	FORCEINLINE TObjectPtr<AFollowCameraActor> GetFollowCameraActor() const { return FollowCamera;}
@@ -182,6 +191,8 @@ protected:
 	void HandleInventory(const FInputActionValue& ActionValue);
 
 	void HandleSprint(const FInputActionValue& ActionValue);
+
+	void HandlePauseMenu(const FInputActionValue& ActionValue);
 
 	virtual void OnHealthChanged(const FOnAttributeChangeData& Data);
 

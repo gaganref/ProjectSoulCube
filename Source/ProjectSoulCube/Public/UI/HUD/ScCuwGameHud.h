@@ -24,6 +24,9 @@ private:
 
 	UPROPERTY(BlueprintGetter = GetInteractableItemHelp, meta = (BindWidget))
 	TObjectPtr<class UScCuwInteractableItemHelp> InteractableItemHelp;
+
+	UPROPERTY(BlueprintGetter = GetPauseMenu, meta = (BindWidget))
+	TObjectPtr<class UPauseMenuWidget> PauseMenu;
 	
 	UPROPERTY(EditAnywhere)
 	FKey ToggleInventoryPrimaryKey = EKeys::I;
@@ -73,4 +76,7 @@ public:
 
 	UFUNCTION(BlueprintGetter)
 	class UScCuwInteractableItemHelp* GetInteractableItemHelp() const;
+
+	UFUNCTION(BlueprintGetter)
+	class UPauseMenuWidget* GetPauseMenu() const;
 };

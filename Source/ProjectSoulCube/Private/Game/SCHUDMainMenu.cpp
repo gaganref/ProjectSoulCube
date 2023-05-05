@@ -49,14 +49,15 @@ void ASCHUDMainMenu::HandleStartButtonPressed()
 {
 	PlayerController->SetShowMouseCursor(false);
 	UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerController);
-	UGameplayStatics::OpenLevelBySoftObjectPtr(this, LevelToOpenOnStart, true);
-	// UGameplayStatics::LoadStreamLevelBySoftObjectPtr()
+
+	if(!LevelToOpenOnStart.IsNull())
+	{
+		UGameplayStatics::OpenLevelBySoftObjectPtr(this, LevelToOpenOnStart, true);
+	}
 }
 
 void ASCHUDMainMenu::HandleQuitButtonPressed()
 {
-	PlayerController->SetShowMouseCursor(false);
-	UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerController);
 	UKismetSystemLibrary::QuitGame(this, PlayerController, EQuitPreference::Quit, false);
 }
 

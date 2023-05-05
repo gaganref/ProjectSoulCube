@@ -122,3 +122,8 @@ UScCuwInteractableItemHelp* UScCuwGameHud::GetInteractableItemHelp() const
 {
 	return InteractableItemHelp;
 }
+
+UPauseMenuWidget* UScCuwGameHud::GetPauseMenu() const
+{
+	return PauseMenu;
+}

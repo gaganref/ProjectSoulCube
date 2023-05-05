@@ -22,6 +22,9 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UScCuwGameHud> HudWidgetClass;
+
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<UWorld> MainMenuLevelRef;
 	
 	UPROPERTY(BlueprintGetter = GetHudWidget)
 	TObjectPtr<class UScCuwGameHud> HudWidget;
@@ -53,6 +56,18 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnInventoryPressed(const bool bShouldOpenInventory);
 
+	UFUNCTION()
+	void HandlePauseGame();
+	
+	UFUNCTION()
+	void HandleResumeGame();
+	
+	UFUNCTION()
+	void HandleRestartGame();
+	
+	UFUNCTION()
+	void HandleReturnToMainMenu();
+	
 public:
 	UFUNCTION(BlueprintGetter)
 	class UScCuwGameHud* GetHudWidget() const;

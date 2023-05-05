@@ -105,6 +105,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		{
 			EnhancedInputComponent->BindAction(InputActionSprint, ETriggerEvent::Triggered, this, &APlayerCharacter::HandleSprint);
 		}
+		if(InputActionPauseMenu && ensure(InputActionPauseMenu->ValueType == EInputActionValueType::Boolean))
+		{
+			EnhancedInputComponent->BindAction(InputActionPauseMenu, ETriggerEvent::Triggered, this, &APlayerCharacter::HandlePauseMenu);
+		}
 	}
 }
 
@@ -208,6 +212,14 @@ void APlayerCharacter::HandleInventory(const FInputActionValue& ActionValue)
 void APlayerCharacter::HandleSprint(const FInputActionValue& ActionValue)
 {
 	SendAbilityLocalInput(ActionValue, SprintAbilityClass, ESCAbilityInputID::Sprint);
+}
+
+void APlayerCharacter::HandlePauseMenu(const FInputActionValue& ActionValue)
+{
+	if(PauseMenuPressedDelegate.IsBound())
+	{
+		PauseMenuPressedDelegate.Broadcast();
+	}
 }
 
 void APlayerCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
