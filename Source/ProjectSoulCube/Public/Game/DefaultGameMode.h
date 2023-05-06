@@ -16,8 +16,11 @@ class PROJECTSOULCUBE_API ADefaultGameMode : public AGameModeBase
 
 private:
 	UPROPERTY(EditAnywhere)
-	FLinearColor CameraFadeInColor = FLinearColor::Red;
+	FLinearColor LooseCameraFadeInColor = FLinearColor::Red;
 
+	UPROPERTY(EditAnywhere)
+	FLinearColor WinCameraFadeInColor = FLinearColor::Green;
+	
 private:
 	virtual void GameWin_Implementation();
 	
@@ -25,9 +28,11 @@ private:
 	
 public:
 
-	virtual void BeginGameWin();
-	
-	virtual void BeginGameLost();
+	UFUNCTION(BlueprintCallable)
+	void BeginGameWin();
+
+	UFUNCTION(BlueprintCallable)
+	void BeginGameLost();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void GameWin();

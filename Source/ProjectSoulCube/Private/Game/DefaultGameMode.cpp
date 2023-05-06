@@ -10,6 +10,25 @@
 
 void ADefaultGameMode::BeginGameWin()
 {
+	TObjectPtr<ACharacter> PlayerCharacterRef = UGameplayStatics::GetPlayerCharacter(this, 0);
+	TObjectPtr<APlayerController> PlayerControllerRef =  UGameplayStatics::GetPlayerController(this, 0);
+	TObjectPtr<APlayerCameraManager> PlayerCameraManagerRef =  UGameplayStatics::GetPlayerCameraManager(this, 0);
+	
+	if(PlayerCharacterRef)
+	{
+		PlayerCharacterRef->DisableInput(PlayerControllerRef);
+	}
+	
+	if(PlayerControllerRef)
+	{
+		PlayerControllerRef->DisableInput(PlayerControllerRef);
+	}
+
+	if(PlayerCameraManagerRef)
+	{
+		PlayerCameraManagerRef->StartCameraFade(0.0f, 0.5f, 3.0f, WinCameraFadeInColor, false, true);
+	}
+	
 	GameWin();
 }
 
@@ -31,7 +50,7 @@ void ADefaultGameMode::BeginGameLost()
 
 	if(PlayerCameraManagerRef)
 	{
-		PlayerCameraManagerRef->StartCameraFade(0.0f, 0.5f, 3.0f, CameraFadeInColor, false, true);
+		PlayerCameraManagerRef->StartCameraFade(0.0f, 0.5f, 3.0f, LooseCameraFadeInColor, false, true);
 	}
 	
 	GameLost();		
@@ -39,6 +58,15 @@ void ADefaultGameMode::BeginGameLost()
 
 void ADefaultGameMode::GameWin_Implementation()
 {
+	TObjectPtr<APlayerController> PlayerControllerRef =  UGameplayStatics::GetPlayerController(this, 0);
+	TObjectPtr<ASCHUDGame> HudRef = Cast<ASCHUDGame>(PlayerControllerRef->GetHUD());
+	if(HudRef)
+	{
+		if(HudRef)
+		{
+			HudRef->ShowWinScreen();
+		}
+	}
 }
 
 void ADefaultGameMode::GameLost_Implementation()
