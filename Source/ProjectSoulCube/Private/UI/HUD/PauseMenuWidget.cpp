@@ -14,6 +14,8 @@ void UPauseMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	SetVisibility(ESlateVisibility::Collapsed);
+	
 	if(ResumeButton)
 	{
 		ResumeButton->GetButtonPressedDelegate()->AddUniqueDynamic(this, &UPauseMenuWidget::HandleResumeButtonPressed);

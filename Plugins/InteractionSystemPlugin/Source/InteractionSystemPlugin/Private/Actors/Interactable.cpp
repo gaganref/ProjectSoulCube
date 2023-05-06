@@ -3,7 +3,6 @@
 
 #include "Actors/Interactable.h"
 
-#include "Components/WidgetComponent.h"
 #include "Misc/InteractionStructs.h"
 
 

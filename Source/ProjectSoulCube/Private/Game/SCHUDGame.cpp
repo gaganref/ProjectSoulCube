@@ -8,9 +8,11 @@
 #include "Interface/InventoryInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacter.h"
+#include "UI/HUD/GameLooseMenu.h"
+#include "UI/HUD/GameWinMenu.h"
 #include "UI/HUD/PauseMenuWidget.h"
 #include "UI/HUD/ScCuwGameHud.h"
-#include "UI/Widgets/PawnWidgets/ScCuwInventoryWidget.h"
+#include "UI/Widgets/Buttons/ScCuwTextButton.h"
 
 ASCHUDGame::ASCHUDGame()
 {
@@ -40,6 +42,13 @@ void ASCHUDGame::OnInit_Implementation()
 			HudWidget->GetPauseMenu()->GetMainMenuButtonPressedDelegate()->AddUniqueDynamic(this, &ASCHUDGame::HandleReturnToMainMenu);
 			HudWidget->GetPauseMenu()->GetRestartButtonPressedDelegate()->AddUniqueDynamic(this, &ASCHUDGame::HandleRestartGame);
 			HudWidget->GetPauseMenu()->GetResumeButtonPressedDelegate()->AddUniqueDynamic(this, &ASCHUDGame::HandleResumeGame);
+
+			HudWidget->GetLooseMenu()->GetRetryButton()->GetButtonPressedDelegate()->AddUniqueDynamic(this, &ASCHUDGame::HandleRestartGame);
+			HudWidget->GetLooseMenu()->GetReturnToMainMenuButton()->GetButtonPressedDelegate()->AddUniqueDynamic(this, &ASCHUDGame::HandleReturnToMainMenu);
+			
+			HudWidget->GetWinMenu()->GetRetryButton()->GetButtonPressedDelegate()->AddUniqueDynamic(this, &ASCHUDGame::HandleRestartGame);
+			HudWidget->GetWinMenu()->GetReturnToMainMenuButton()->GetButtonPressedDelegate()->AddUniqueDynamic(this, &ASCHUDGame::HandleReturnToMainMenu);
+			HudWidget->GetWinMenu()->GetNextLevelButton()->GetButtonPressedDelegate()->AddUniqueDynamic(this, &ASCHUDGame::HandleNextLevel);
 		}
 	}
 
@@ -124,6 +133,39 @@ void ASCHUDGame::HandleRestartGame()
 {
 	FName LevelName = *UGameplayStatics::GetCurrentLevelName(this, true);
 	UGameplayStatics::OpenLevel(this, LevelName, true);
+}
+
+void ASCHUDGame::HandleNextLevel()
+{
+	// TODO:
+}
+
+void ASCHUDGame::ShowLooseScreen()
+{
+	if(PlayerController)
+	{
+		PlayerController->SetShowMouseCursor(true);
+		UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(PlayerController);
+	}
+	
+	if(HudWidget)
+	{
+		HudWidget->ShowLooseScreen();
+	}
+}
+
+void ASCHUDGame::ShowWinScreen()
+{
+	if(PlayerController)
+	{
+		PlayerController->SetShowMouseCursor(true);
+		UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(PlayerController);
+	}
+	
+	if(HudWidget)
+	{
+		HudWidget->ShowWinScreen();
+	}
 }
 
 void ASCHUDGame::HandleReturnToMainMenu()

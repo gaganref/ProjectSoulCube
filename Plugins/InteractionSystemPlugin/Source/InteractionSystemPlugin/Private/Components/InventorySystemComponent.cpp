@@ -5,6 +5,7 @@
 
 #include "Interface/InteractableInterface.h"
 #include "..\..\Public\Misc\InteractionStructs.h"
+#include "Interface/InventoryInterface.h"
 #include "Interface/ItemsAlterInterface.h"
 
 
@@ -335,6 +336,18 @@ TArray<FInventoryItemInfo*> UInventorySystemComponent::GetInventoryItemsInfo() c
 
 void UInventorySystemComponent::ToggleInventory()
 {
+	// dont open inventory if the owner is dead
+	if(OwnerPawn)
+	{
+		if(OwnerPawn->GetClass()->ImplementsInterface(UInventoryInterface::StaticClass()))
+		{
+			if(!IInventoryInterface::Execute_IsOwnerAlive(OwnerPawn))
+			{
+				return;
+			}
+		}
+	}
+	
 	bIsInventoryOpen = !bIsInventoryOpen;
 	if(InventoryPressedDelegate.IsBound())
 	{

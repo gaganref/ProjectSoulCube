@@ -5,6 +5,9 @@
 
 #include "Components/InventorySystemComponent.h"
 #include "Interface/InventoryInterface.h"
+#include "UI/HUD/GameLooseMenu.h"
+#include "UI/HUD/GameWinMenu.h"
+#include "UI/HUD/PauseMenuWidget.h"
 #include "UI/Widgets/DataWidgets/ScCuwInteractableItemHelp.h"
 #include "UI/Widgets/DataWidgets/ScCuwInventoryItemStats.h"
 #include "UI/Widgets/PawnWidgets/ScCuwInventoryWidget.h"
@@ -108,6 +111,28 @@ FReply UScCuwGameHud::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEve
 	return FEventReply(false).NativeReply;
 }
 
+void UScCuwGameHud::ShowLooseScreen()
+{
+	PlayerStats->SetVisibility(ESlateVisibility::Collapsed);
+	Inventory->SetVisibility(ESlateVisibility::Collapsed);
+	InteractableItemHelp->SetVisibility(ESlateVisibility::Collapsed);
+	PauseMenu->SetVisibility(ESlateVisibility::Collapsed);
+	WinMenu->SetVisibility(ESlateVisibility::Collapsed);
+	
+	LooseMenu->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UScCuwGameHud::ShowWinScreen()
+{
+	PlayerStats->SetVisibility(ESlateVisibility::Collapsed);
+	Inventory->SetVisibility(ESlateVisibility::Collapsed);
+	InteractableItemHelp->SetVisibility(ESlateVisibility::Collapsed);
+	PauseMenu->SetVisibility(ESlateVisibility::Collapsed);
+	LooseMenu->SetVisibility(ESlateVisibility::Collapsed);
+
+	WinMenu->SetVisibility(ESlateVisibility::Visible);
+}
+
 UScCuwPawnStats* UScCuwGameHud::GetPlayerStats() const
 {
 	return PlayerStats;
@@ -126,4 +151,14 @@ UScCuwInteractableItemHelp* UScCuwGameHud::GetInteractableItemHelp() const
 UPauseMenuWidget* UScCuwGameHud::GetPauseMenu() const
 {
 	return PauseMenu;
+}
+
+UGameLooseMenu* UScCuwGameHud::GetLooseMenu() const
+{
+	return LooseMenu;
+}
+
+UGameWinMenu* UScCuwGameHud::GetWinMenu() const
+{
+	return WinMenu;
 }

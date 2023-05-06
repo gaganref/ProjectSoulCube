@@ -69,7 +69,7 @@
 		},
 		{
 			"Name": "QuickActions",
-			"Enabled": true,
+			"Enabled": false,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/01e9d950f52648ee96e9b01711df283e"
 		},
 		{

@@ -26,4 +26,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UInventorySystemComponent* GetInventorySystemComponent();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsOwnerAlive();
 };

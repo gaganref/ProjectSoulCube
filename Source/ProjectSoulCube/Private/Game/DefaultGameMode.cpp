@@ -21,27 +21,35 @@ void ADefaultGameMode::BeginGameLost()
 	
 	if(PlayerCharacterRef)
 	{
-		PlayerControllerRef->DisableInput(PlayerControllerRef);
 		PlayerCharacterRef->DisableInput(PlayerControllerRef);
 	}
 	
 	if(PlayerControllerRef)
 	{
-		TObjectPtr<ASCHUDGame> HudRef = Cast<ASCHUDGame>(PlayerControllerRef->GetHUD());
-		if(HudRef)
-		{
-			TObjectPtr<UScCuwGameHud> HudWidgetRef = HudRef->GetHudWidget();
-			if(HudWidgetRef)
-			{
-				HudWidgetRef->RemoveFromParent();
-			}
-		}
+		PlayerControllerRef->DisableInput(PlayerControllerRef);
 	}
 
 	if(PlayerCameraManagerRef)
 	{
-		PlayerCameraManagerRef->StartCameraFade(0.0f, 0.75f, 3.0f, CameraFadeInColor, false, true);
+		PlayerCameraManagerRef->StartCameraFade(0.0f, 0.5f, 3.0f, CameraFadeInColor, false, true);
 	}
 	
 	GameLost();		
+}
+
+void ADefaultGameMode::GameWin_Implementation()
+{
+}
+
+void ADefaultGameMode::GameLost_Implementation()
+{
+	TObjectPtr<APlayerController> PlayerControllerRef =  UGameplayStatics::GetPlayerController(this, 0);
+	TObjectPtr<ASCHUDGame> HudRef = Cast<ASCHUDGame>(PlayerControllerRef->GetHUD());
+	if(HudRef)
+	{
+		if(HudRef)
+		{
+			HudRef->ShowLooseScreen();
+		}
+	}
 }

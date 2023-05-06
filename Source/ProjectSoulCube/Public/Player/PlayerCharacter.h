@@ -221,6 +221,8 @@ public:
 	//~ Begin IAbilitySystemInterface
 	/** Returns our Ability System Component. */
 	virtual UInventorySystemComponent* GetInventorySystemComponent_Implementation() override;
+
+	virtual bool IsOwnerAlive_Implementation() override;
 	//~ End IAbilitySystemInterface
 
 	virtual float GetHealth() const override;

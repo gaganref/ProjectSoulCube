@@ -27,6 +27,12 @@ private:
 
 	UPROPERTY(BlueprintGetter = GetPauseMenu, meta = (BindWidget))
 	TObjectPtr<class UPauseMenuWidget> PauseMenu;
+
+	UPROPERTY(BlueprintGetter = GetLooseMenu, meta = (BindWidget))
+	TObjectPtr<class UGameLooseMenu> LooseMenu;
+
+	UPROPERTY(BlueprintGetter = GetWinMenu, meta = (BindWidget))
+	TObjectPtr<class UGameWinMenu> WinMenu;
 	
 	UPROPERTY(EditAnywhere)
 	FKey ToggleInventoryPrimaryKey = EKeys::I;
@@ -79,4 +85,17 @@ public:
 
 	UFUNCTION(BlueprintGetter)
 	class UPauseMenuWidget* GetPauseMenu() const;
+
+	UFUNCTION(BlueprintGetter)
+	class UGameLooseMenu* GetLooseMenu() const;
+
+	UFUNCTION(BlueprintGetter)
+	class UGameWinMenu* GetWinMenu() const;
+
+public:
+
+	void ShowLooseScreen();
+
+	void ShowWinScreen();
+	
 };

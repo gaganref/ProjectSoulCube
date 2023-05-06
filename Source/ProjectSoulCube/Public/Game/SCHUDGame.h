@@ -67,6 +67,15 @@ public:
 	
 	UFUNCTION()
 	void HandleReturnToMainMenu();
+
+	UFUNCTION()
+	void HandleNextLevel();
+
+public:
+
+	void ShowLooseScreen();
+
+	void ShowWinScreen();
 	
 public:
 	UFUNCTION(BlueprintGetter)

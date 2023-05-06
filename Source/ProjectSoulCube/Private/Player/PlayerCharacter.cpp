@@ -581,6 +581,11 @@ UInventorySystemComponent* APlayerCharacter::GetInventorySystemComponent_Impleme
 	return InventorySystemComponent;
 }
 
+bool APlayerCharacter::IsOwnerAlive_Implementation()
+{
+	return IsAlive();
+}
+
 FPlayerHealthChanged* APlayerCharacter::GetPlayerHealthChangedDelegate()
 {
 	return &PlayerHealthChangedDelegate;
