@@ -7,6 +7,8 @@
 #include "Engine/DataTable.h"
 #include "InventorySystemComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPickItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDropItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAddItem, const FName, ItemRowId, const int32, ItemQuantity);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnRemoveItem, const FName, ItemRowId, const int32, ItemQuantity);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryPressed, const bool, bShouldOpenInventory);
@@ -50,6 +52,8 @@ private:
 	bool bIsInventoryOpen = false;
 
 private:
+	FOnPickItem PickItemDelegate;
+	FOnDropItem DropItemDelegate;
 	FOnAddItem AddItemDelegate;
 	FOnRemoveItem RemoveItemDelegate;
 	FOnInventoryPressed InventoryPressedDelegate;
@@ -127,6 +131,10 @@ public:
 	void ToggleInventory();
 
 public:
+	FOnPickItem* GetPickItemDelegate() { return &PickItemDelegate; }
+	
+	FOnDropItem* GetDropItemDelegate() { return &DropItemDelegate; }
+	
 	FOnAddItem* GetAddItemDelegate() { return &AddItemDelegate; }
 
 	FOnRemoveItem* GetRemoveItemDelegate() { return &RemoveItemDelegate; }

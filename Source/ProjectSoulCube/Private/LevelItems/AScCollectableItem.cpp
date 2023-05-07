@@ -113,11 +113,7 @@ int32 AAScCollectableItem::GetItemWeight_Implementation()
 void AAScCollectableItem::OnInteract_Implementation(AActor* Caller)
 {
 	IInteractableInterface::OnInteract_Implementation(Caller);
-
-	// Make sure to end the focus
-	// EndFocus(Caller);
 	
-	// TODO: apply its gameplay effect
 	if(!Caller || !ItemGameplayAffectClass)
 	{
 		return;
@@ -139,6 +135,18 @@ void AAScCollectableItem::OnInteract_Implementation(AActor* Caller)
 	
 	const FGameplayEffectContextHandle GameplayEffectContextHandle;
 	AscRef->ApplyGameplayEffectToSelf(ItemGameplayAffect, 0.0f, GameplayEffectContextHandle);
+
+	if(ItemUseSound)
+	{
+		if(GetWorld())
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ItemUseSound, GetActorLocation(), ItemUseVolumeMultiplier, ItemUsePitchMultiplier);	
+		}
+		else
+		{
+			UGameplayStatics::PlaySoundAtLocation(Caller, ItemUseSound, Caller->GetActorLocation(), ItemUseVolumeMultiplier, ItemUsePitchMultiplier);
+		}
+	}
 	
 	// Only Destroy the actor if it is placed in the level
 	if(GetWorld() != NULL)

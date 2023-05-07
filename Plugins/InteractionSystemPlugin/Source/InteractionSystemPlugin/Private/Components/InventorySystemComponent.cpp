@@ -70,6 +70,10 @@ void UInventorySystemComponent::AddItem(AActor* Actor)
 	{
 		AddItemDelegate.Broadcast(RowName, NewItemQuantity);
 	}
+	if(PickItemDelegate.IsBound())
+	{
+		PickItemDelegate.Broadcast();
+	}
 	
 	Actor->Destroy();
 }
@@ -128,6 +132,11 @@ void UInventorySystemComponent::OfferInventoryItem(FName ItemRow)
     	if(RemoveItemByItemRowName(ItemRow))
     	{
     		IItemsAlterInterface::Execute_HandleItemOffering(AlterRef, ItemWeightRef);
+
+    		if(DropItemDelegate.IsBound())
+    		{
+    			DropItemDelegate.Broadcast();
+    		}
     	}
     }
 }
@@ -193,6 +202,11 @@ void UInventorySystemComponent::DropInventoryItem(FName ItemRow)
 		ItemSpawnParams.Instigator = OwnerPawn;
 		ItemSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		GetWorld()->SpawnActor(Item->ItemClass, &ItemSpawnLocation, &ItemSpawnRotation, ItemSpawnParams);
+
+		if(DropItemDelegate.IsBound())
+		{
+			DropItemDelegate.Broadcast();
+		}
 	}
 }
 

@@ -129,10 +129,26 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability System")
 	TSubclassOf<class USCGameplayAbility> SprintAbilityClass;
 	
-	// // Default abilities for this Character. These will be removed on Character death and re-given if Character respawns.
-	// UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability System")
-	// TArray<TSubclassOf<class USCGameplayAbility>> CharacterAbilities;
+protected:
 
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USoundBase> ItemPickSound;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	float ItemPickVolumeMultiplier = 1.0f;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	float ItemPickPitchMultiplier = 1.0f;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USoundBase> ItemDropSound;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	float ItemDropVolumeMultiplier = 1.0f;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	float ItemDropPitchMultiplier = 1.0f;
+	
 protected:
 	FGameplayTag DeadTag;
 
@@ -207,6 +223,13 @@ protected:
 	virtual void OnStaminaChanged(const FOnAttributeChangeData& Data);
 
 	virtual void OnMaxInventorySizeChanged(const FOnAttributeChangeData& Data);
+
+	UFUNCTION()
+	void HandleItemDropAudio();
+
+	UFUNCTION()
+	void HandleItemPickAudio();
+	
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void StartSprinting();

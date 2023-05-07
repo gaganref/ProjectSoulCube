@@ -77,6 +77,12 @@ void APlayerCharacter::BeginPlay()
 		StaminaChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PlayerAttributeSet->GetStaminaAttribute()).AddUObject(this, &APlayerCharacter::OnStaminaChanged);
 		MaxInventorySizeChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PlayerAttributeSet->GetMaxInventorySizeAttribute()).AddUObject(this, &APlayerCharacter::OnMaxInventorySizeChanged);
 	}
+
+	if(InventorySystemComponent)
+	{
+		InventorySystemComponent->GetPickItemDelegate()->AddUniqueDynamic(this, &APlayerCharacter::HandleItemPickAudio);
+		InventorySystemComponent->GetDropItemDelegate()->AddUniqueDynamic(this, &APlayerCharacter::HandleItemDropAudio);
+	}
 }
 
 // Called every frame
@@ -280,6 +286,28 @@ void APlayerCharacter::OnMaxInventorySizeChanged(const FOnAttributeChangeData& D
 	if(InventorySystemComponent)
 	{
 		InventorySystemComponent->SetMaxInventorySize(Data.NewValue);
+	}
+}
+
+void APlayerCharacter::HandleItemDropAudio()
+{
+	if(ItemDropSound)
+	{
+		if(GetWorld())
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ItemDropSound, GetActorLocation(), ItemDropVolumeMultiplier, ItemDropPitchMultiplier);	
+		}
+	}
+}
+
+void APlayerCharacter::HandleItemPickAudio()
+{
+	if(ItemPickSound)
+	{
+		if(GetWorld())
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ItemPickSound, GetActorLocation(), ItemPickVolumeMultiplier, ItemPickPitchMultiplier);	
+		}
 	}
 }
 

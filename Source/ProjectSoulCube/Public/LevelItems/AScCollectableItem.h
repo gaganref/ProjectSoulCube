@@ -42,6 +42,15 @@ protected:
 	FDataTableRowHandle ItemInfo;
 	
 	FInventoryItemInfo* ItemInfoData;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USoundBase> ItemUseSound;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	float ItemUseVolumeMultiplier = 1.0f;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	float ItemUsePitchMultiplier = 1.0f;
 	
 public:
 	// Sets default values for this actor's properties
