@@ -58,6 +58,9 @@ private:
 	/** Should we use custom follow camera implementation or a spring arm camera . */
 	UPROPERTY(Category = "Camera", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> Camera;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UStaticMeshComponent> ShieldFx;
 	
 	/** Should we use custom follow camera implementation or a spring arm camera . */
 	UPROPERTY(Category = "Camera", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -75,6 +78,9 @@ private:
 	UPROPERTY(Category = "Controller", VisibleDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class ACubeController> PlayerControllerRef;
 
+	UPROPERTY(Category = "FX", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	bool bCanShowShieldFx = false;
+	
 	UPROPERTY(Category = "Input", EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UInputAction> InputActionItemPickUp;
 

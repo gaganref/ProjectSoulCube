@@ -39,6 +39,11 @@ APlayerCharacter::APlayerCharacter()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(CameraBoom);
 
+	ShieldFx = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Shield Fx"));
+	ShieldFx->SetupAttachment(GetCapsuleComponent());
+	ShieldFx->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ShieldFx->SetVisibility(bCanShowShieldFx);
+	
 	InteractionDetectionComponent = CreateDefaultSubobject<UInteractionDetectionComponent>(TEXT("Interaction Detection Component"));
 	InventorySystemComponent = CreateDefaultSubobject<UInventorySystemComponent>(TEXT("Inventory Sysytem Component"));
 	
@@ -238,6 +243,24 @@ void APlayerCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
 
 void APlayerCharacter::OnShieldChanged(const FOnAttributeChangeData& Data)
 {
+	if(bCanShowShieldFx)
+	{
+		if(Data.NewValue <= 0.0f)
+		{
+			if(ShieldFx->GetVisibleFlag())
+			{
+				ShieldFx->SetVisibility(false);	
+			}
+		}
+		else
+		{
+			if(!ShieldFx->GetVisibleFlag())
+			{
+				ShieldFx->SetVisibility(true);	
+			}
+		}
+	}
+	
 	if(PlayerShieldChangedDelegate.IsBound())
 	{
 		PlayerShieldChangedDelegate.Broadcast(Data.NewValue);
