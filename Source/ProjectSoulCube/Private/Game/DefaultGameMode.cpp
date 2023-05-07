@@ -4,6 +4,7 @@
 #include "Game/DefaultGameMode.h"
 
 #include "Game/SCHUDGame.h"
+#include "Interface/PlayerAnimInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacter.h"
 #include "UI/HUD/ScCuwGameHud.h"
@@ -17,6 +18,17 @@ void ADefaultGameMode::BeginGameWin()
 	if(PlayerCharacterRef)
 	{
 		PlayerCharacterRef->DisableInput(PlayerControllerRef);
+
+		if(PlayerCharacterRef->GetMesh())
+		{
+			if(UAnimInstance* Ai = PlayerCharacterRef->GetMesh()->GetAnimInstance())
+			{
+				if(Ai->GetClass()->ImplementsInterface(UPlayerAnimInterface::StaticClass()))
+				{
+					IPlayerAnimInterface::Execute_PlayWinAnimation(Ai);
+				}
+			}
+		}
 	}
 	
 	if(PlayerControllerRef)
