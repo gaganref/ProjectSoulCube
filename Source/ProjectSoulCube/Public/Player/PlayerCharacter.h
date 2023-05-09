@@ -164,7 +164,8 @@ protected:
 	FPlayerHealthChanged PlayerHealthChangedDelegate;
 	FPlayerShieldChanged PlayerShieldChangedDelegate;
 	FPlayerStaminaChanged PlayerStaminaChangedDelegate;
-
+	FPlayerHealthDamaged PlayerHealthDamagedDelegate;
+	FPlayerShieldDamaged PlayerShieldDamagedDelegate;
 	
 public:
 	
@@ -176,6 +177,8 @@ public:
 	virtual FPlayerHealthChanged* GetPlayerHealthChangedDelegate() override;
 	virtual FPlayerShieldChanged* GetPlayerShieldChangedDelegate() override;
 	virtual FPlayerStaminaChanged* GetPlayerStaminaChangedDelegate() override;
+	virtual FPlayerHealthDamaged* GetPlayerHealthDamagedDelegate() override;
+	virtual FPlayerShieldDamaged* GetPlayerShieldDamagedDelegate() override;
 
 protected:
 

@@ -7,7 +7,6 @@
 #include "Interface/PlayerAnimInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacter.h"
-#include "UI/HUD/ScCuwGameHud.h"
 
 void ADefaultGameMode::BeginGameWin()
 {
@@ -92,4 +91,14 @@ void ADefaultGameMode::GameLost_Implementation()
 			HudRef->ShowLooseScreen();
 		}
 	}
+}
+
+int32 ADefaultGameMode::GetTargetWeightToWin() const
+{
+	return TargetWeightToWin;
+}
+
+void ADefaultGameMode::SetTargetWeightToWin(const int32 NewWeight)
+{
+	TargetWeightToWin = NewWeight;
 }

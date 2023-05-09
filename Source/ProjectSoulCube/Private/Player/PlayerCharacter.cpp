@@ -235,6 +235,15 @@ void APlayerCharacter::HandlePauseMenu(const FInputActionValue& ActionValue)
 
 void APlayerCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
 {
+	// check if it is a damage or a buff
+	if(Data.NewValue < Data.OldValue)
+	{
+		if(PlayerHealthDamagedDelegate.IsBound())
+		{
+			PlayerHealthDamagedDelegate.Broadcast();
+		}
+	}
+	
 	if(PlayerHealthChangedDelegate.IsBound())
 	{
 		PlayerHealthChangedDelegate.Broadcast(Data.NewValue);
@@ -264,6 +273,15 @@ void APlayerCharacter::OnShieldChanged(const FOnAttributeChangeData& Data)
 			{
 				ShieldFx->SetVisibility(true);	
 			}
+		}
+	}
+
+	// check if it is a damage or a buff
+	if(Data.NewValue < Data.OldValue)
+	{
+		if(PlayerShieldDamagedDelegate.IsBound())
+		{
+			PlayerShieldDamagedDelegate.Broadcast();
 		}
 	}
 	
@@ -650,4 +668,14 @@ FPlayerShieldChanged* APlayerCharacter::GetPlayerShieldChangedDelegate()
 FPlayerStaminaChanged* APlayerCharacter::GetPlayerStaminaChangedDelegate()
 {
 	return &PlayerStaminaChangedDelegate;
+}
+
+FPlayerHealthDamaged* APlayerCharacter::GetPlayerHealthDamagedDelegate()
+{
+	return &PlayerHealthDamagedDelegate;
+}
+
+FPlayerShieldDamaged* APlayerCharacter::GetPlayerShieldDamagedDelegate()
+{
+	return &PlayerShieldDamagedDelegate;
 }

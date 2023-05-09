@@ -15,6 +15,9 @@ class PROJECTSOULCUBE_API ADefaultGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 private:
+	UPROPERTY(EditAnywhere, BlueprintGetter = GetTargetWeightToWin, BlueprintSetter = SetTargetWeightToWin)
+	int32 TargetWeightToWin = 20;
+	
 	UPROPERTY(EditAnywhere)
 	FLinearColor LooseCameraFadeInColor = FLinearColor::Red;
 
@@ -39,4 +42,13 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void GameLost();
+
+
+public:
+	UFUNCTION(BlueprintGetter)
+	int32 GetTargetWeightToWin() const;
+
+public:
+	UFUNCTION(BlueprintSetter)
+	void SetTargetWeightToWin(const int32 NewWeight);
 };

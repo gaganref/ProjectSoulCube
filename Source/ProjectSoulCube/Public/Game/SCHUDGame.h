@@ -56,6 +56,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnInventoryPressed(const bool bShouldOpenInventory);
 
+	UFUNCTION(BlueprintCallable)
+	void SetGameObjectiveCurrentData(const int32 NewData);
+
+	UFUNCTION(BlueprintCallable)
+	void SetGameObjectiveTargetData(const int32 NewData);
+	
 	UFUNCTION()
 	void HandlePauseGame();
 	

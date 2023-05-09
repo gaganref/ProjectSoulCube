@@ -10,6 +10,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerHealthChanged, float, NewHeal
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerShieldChanged, float, NewShield);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerStaminaChanged, float, NewStamina);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerHealthDamaged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerShieldDamaged);
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UPlayerStatsInterface : public UInterface
@@ -51,4 +54,8 @@ public:
 	virtual FPlayerShieldChanged* GetPlayerShieldChangedDelegate() = 0;
 
 	virtual FPlayerStaminaChanged* GetPlayerStaminaChangedDelegate() = 0;
+	
+	virtual FPlayerHealthDamaged* GetPlayerHealthDamagedDelegate() = 0;
+
+	virtual FPlayerShieldDamaged* GetPlayerShieldDamagedDelegate() = 0;
 };

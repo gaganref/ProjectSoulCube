@@ -25,6 +25,9 @@ private:
 	UPROPERTY(BlueprintGetter = GetInteractableItemHelp, meta = (BindWidget))
 	TObjectPtr<class UScCuwInteractableItemHelp> InteractableItemHelp;
 
+	UPROPERTY(BlueprintGetter = GetAlterHelpWidget, meta = (BindWidget))
+	TObjectPtr<class UAlterHelpWidget> AlterHelpWidget;
+	
 	UPROPERTY(BlueprintGetter = GetPauseMenu, meta = (BindWidget))
 	TObjectPtr<class UPauseMenuWidget> PauseMenu;
 
@@ -33,6 +36,12 @@ private:
 
 	UPROPERTY(BlueprintGetter = GetWinMenu, meta = (BindWidget))
 	TObjectPtr<class UGameWinMenu> WinMenu;
+
+	UPROPERTY(BlueprintGetter = GetDamageDisplay, meta = (BindWidget))
+	TObjectPtr<class UImage> DamageDisplay;
+	
+	UPROPERTY(BlueprintGetter = GetGameObjective, meta = (BindWidget))
+	TObjectPtr<class UGameObjectiveWidget> GameObjective;
 	
 	UPROPERTY(EditAnywhere)
 	FKey ToggleInventoryPrimaryKey = EKeys::I;
@@ -45,6 +54,9 @@ private:
 
 	UPROPERTY()
 	bool bIsItemHelpTextOpen = false;
+
+	UPROPERTY()
+	bool bIsAlterHelpOpen = false;
 	
 protected:
 	virtual void NativePreConstruct() override;
@@ -56,6 +68,10 @@ protected:
 	virtual void ShowItemHelp_Implementation(AActor* Item);
 
 	virtual void HideItemHelp_Implementation(AActor* Item);
+	
+	virtual void HandleHealthDamage_Implementation();
+
+	virtual void HandleShieldDamage_Implementation();
 
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
@@ -71,6 +87,19 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void HideItemHelp(AActor* Item);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void HandleHealthDamage();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void HandleShieldDamage();
+	
+	UFUNCTION(BlueprintCallable)
+	void ShowAlterHelp();
+
+	UFUNCTION(BlueprintCallable)
+	void HideAlterHelp();
+	
 public:
 	// Getters
 	
@@ -84,6 +113,9 @@ public:
 	class UScCuwInteractableItemHelp* GetInteractableItemHelp() const;
 
 	UFUNCTION(BlueprintGetter)
+	class UAlterHelpWidget* GetAlterHelpWidget() const;
+	
+	UFUNCTION(BlueprintGetter)
 	class UPauseMenuWidget* GetPauseMenu() const;
 
 	UFUNCTION(BlueprintGetter)
@@ -92,6 +124,12 @@ public:
 	UFUNCTION(BlueprintGetter)
 	class UGameWinMenu* GetWinMenu() const;
 
+	UFUNCTION(BlueprintGetter)
+	class UImage* GetDamageDisplay() const;
+
+	UFUNCTION(BlueprintGetter)
+	class UGameObjectiveWidget* GetGameObjective() const;
+	
 public:
 
 	void ShowLooseScreen();

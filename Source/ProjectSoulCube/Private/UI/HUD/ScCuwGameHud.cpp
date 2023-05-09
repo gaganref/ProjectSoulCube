@@ -5,9 +5,11 @@
 
 #include "Components/InventorySystemComponent.h"
 #include "Interface/InventoryInterface.h"
+#include "Interface/PlayerStatsInterface.h"
 #include "UI/HUD/GameLooseMenu.h"
 #include "UI/HUD/GameWinMenu.h"
 #include "UI/HUD/PauseMenuWidget.h"
+#include "UI/Widgets/DataWidgets/AlterHelpWidget.h"
 #include "UI/Widgets/DataWidgets/ScCuwInteractableItemHelp.h"
 #include "UI/Widgets/DataWidgets/ScCuwInventoryItemStats.h"
 #include "UI/Widgets/PawnWidgets/ScCuwInventoryWidget.h"
@@ -25,6 +27,7 @@ void UScCuwGameHud::NativeConstruct()
 	Super::NativeConstruct();
 
 	InteractableItemHelp->SetVisibility(ESlateVisibility::Collapsed);
+	AlterHelpWidget->SetVisibility(ESlateVisibility::Collapsed);
 	SetFocus();
 }
 
@@ -45,6 +48,14 @@ void UScCuwGameHud::OnInit_Implementation(AController* Controller)
 		if(PlayerPawn->GetClass()->ImplementsInterface(UInventoryInterface::StaticClass()))
 		{
 			InventoryRef = IInventoryInterface::Execute_GetInventorySystemComponent(PlayerPawn);
+		}
+
+		IPlayerStatsInterface* PlayerStatsInterface = Cast<IPlayerStatsInterface>(PlayerPawn);
+
+		if(PlayerStatsInterface)
+		{
+			PlayerStatsInterface->GetPlayerHealthDamagedDelegate()->AddUniqueDynamic(this, &UScCuwGameHud::HandleHealthDamage);
+			PlayerStatsInterface->GetPlayerShieldDamagedDelegate()->AddUniqueDynamic(this, &UScCuwGameHud::HandleShieldDamage);
 		}
 	}
 
@@ -89,6 +100,28 @@ void UScCuwGameHud::HideItemHelp_Implementation(AActor* Item)
 {
 	bIsItemHelpTextOpen = false;
 	InteractableItemHelp->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+void UScCuwGameHud::HandleHealthDamage_Implementation()
+{
+	// Play damage animation in Bp
+}
+
+void UScCuwGameHud::HandleShieldDamage_Implementation()
+{
+	// Play damage animation in Bp
+}
+
+void UScCuwGameHud::ShowAlterHelp()
+{
+	bIsAlterHelpOpen = true;
+	AlterHelpWidget->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UScCuwGameHud::HideAlterHelp()
+{
+	bIsAlterHelpOpen = false;
+	AlterHelpWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 FReply UScCuwGameHud::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
@@ -148,6 +181,11 @@ UScCuwInteractableItemHelp* UScCuwGameHud::GetInteractableItemHelp() const
 	return InteractableItemHelp;
 }
 
+UAlterHelpWidget* UScCuwGameHud::GetAlterHelpWidget() const
+{
+	return AlterHelpWidget;
+}
+
 UPauseMenuWidget* UScCuwGameHud::GetPauseMenu() const
 {
 	return PauseMenu;
@@ -161,4 +199,14 @@ UGameLooseMenu* UScCuwGameHud::GetLooseMenu() const
 UGameWinMenu* UScCuwGameHud::GetWinMenu() const
 {
 	return WinMenu;
+}
+
+UImage* UScCuwGameHud::GetDamageDisplay() const
+{
+	return DamageDisplay;
+}
+
+UGameObjectiveWidget* UScCuwGameHud::GetGameObjective() const
+{
+	return GameObjective;
 }

@@ -5,6 +5,7 @@
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/InventorySystemComponent.h"
+#include "Game/DefaultGameMode.h"
 #include "Interface/InventoryInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacter.h"
@@ -13,6 +14,7 @@
 #include "UI/HUD/PauseMenuWidget.h"
 #include "UI/HUD/ScCuwGameHud.h"
 #include "UI/Widgets/Buttons/ScCuwTextButton.h"
+#include "UI/Widgets/DataWidgets/GameObjectiveWidget.h"
 
 ASCHUDGame::ASCHUDGame()
 {
@@ -51,7 +53,7 @@ void ASCHUDGame::OnInit_Implementation()
 			HudWidget->GetWinMenu()->GetNextLevelButton()->GetButtonPressedDelegate()->AddUniqueDynamic(this, &ASCHUDGame::HandleNextLevel);
 		}
 	}
-
+	
 	if(PlayerPawn)
 	{
 		if(PlayerPawn->GetClass()->ImplementsInterface(UInventoryInterface::StaticClass()))
@@ -63,13 +65,18 @@ void ASCHUDGame::OnInit_Implementation()
 				InventoryRef->GetInventoryPressedDelegate()->AddUniqueDynamic(this, &ASCHUDGame::OnInventoryPressed);
 			}
 		}
+		
 		if(APlayerCharacter* Pc = Cast<APlayerCharacter>(PlayerPawn))
 		{
 			Pc->GetPauseMenuPressedDelegate()->AddUniqueDynamic(this, &ASCHUDGame::HandlePauseGame);
 		}
 	}
 
-	
+	if(TObjectPtr<ADefaultGameMode> Gm = Cast<ADefaultGameMode>(UGameplayStatics::GetGameMode(this)))
+	{
+		SetGameObjectiveCurrentData(0);
+		SetGameObjectiveTargetData(Gm->GetTargetWeightToWin());
+	}
 }
 
 void ASCHUDGame::OnInventoryPressed_Implementation(const bool bShouldOpenInventory)
@@ -88,6 +95,29 @@ void ASCHUDGame::OnInventoryPressed_Implementation(const bool bShouldOpenInvento
 	{
 		PlayerController->SetShowMouseCursor(false);
 		UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerController);
+	}
+}
+
+
+void ASCHUDGame::SetGameObjectiveCurrentData(const int32 NewData)
+{
+	if(HudWidget)
+	{
+		if(HudWidget->GetGameObjective())
+		{
+			HudWidget->GetGameObjective()->SetCurrentWeight(NewData);
+		}
+	}
+}
+
+void ASCHUDGame::SetGameObjectiveTargetData(const int32 NewData)
+{
+	if(HudWidget)
+	{
+		if(HudWidget->GetGameObjective())
+		{
+			HudWidget->GetGameObjective()->SetTargetWeight(NewData);
+		}
 	}
 }
 
