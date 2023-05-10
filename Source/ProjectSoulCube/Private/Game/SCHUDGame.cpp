@@ -168,6 +168,13 @@ void ASCHUDGame::HandleRestartGame()
 void ASCHUDGame::HandleNextLevel()
 {
 	// TODO:
+	FName LevelName = *UGameplayStatics::GetCurrentLevelName(this, true);
+	int32 LevelIndex = GetLevelIndexByName(LevelName);
+
+	if(LevelIndex >= 0 && LevelIndex < LevelsRef.Num()-1)
+	{
+		UGameplayStatics::OpenLevel(this, LevelsRef[LevelIndex+1], true);
+	}
 }
 
 void ASCHUDGame::ShowLooseScreen()
@@ -224,6 +231,18 @@ void ASCHUDGame::HideItemInfo_Implementation(AActor* InteractableRef)
 	IInteractableItemHudInterface::HideItemInfo_Implementation(InteractableRef);
 	
 	HudWidget->HideItemHelp(InteractableRef);
+}
+
+int32 ASCHUDGame::GetLevelIndexByName(const FName& InName)
+{
+	for(int Itr = 0; Itr < LevelsRef.Num(); Itr++)
+	{
+		if(LevelsRef[Itr] == InName)
+		{
+			return Itr;
+		}
+	}
+	return -1;
 }
 
 UScCuwGameHud* ASCHUDGame::GetHudWidget() const

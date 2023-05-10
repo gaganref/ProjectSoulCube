@@ -24,6 +24,9 @@ private:
 	TSubclassOf<class UScCuwGameHud> HudWidgetClass;
 
 	UPROPERTY(EditAnywhere)
+	TArray<FName> LevelsRef;
+	
+	UPROPERTY(EditAnywhere)
 	TSoftObjectPtr<UWorld> MainMenuLevelRef;
 	
 	UPROPERTY(BlueprintGetter = GetHudWidget)
@@ -48,6 +51,8 @@ protected:
 	virtual void ShowItemInfo_Implementation(AActor* InteractableRef) override;
 	
 	virtual void HideItemInfo_Implementation(AActor* InteractableRef) override;
+
+	int32 GetLevelIndexByName(const FName& InName);
 	
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
