@@ -91,4 +91,9 @@ public:
 public:
 	FORCEINLINE UStaticMeshComponent* GetInteractableMesh() const { return InteractableMesh; }
 
+#if WITH_DEV_AUTOMATION_TESTS
+
+	FORCEINLINE void SetItemInfoData(FInventoryItemInfo* NewData) { ItemInfoData = NewData; }
+
+#endif	
 };

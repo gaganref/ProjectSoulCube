@@ -13,13 +13,14 @@ public class ProjectSoulCube : ModuleRules
 			{
 				"Core", 
 				"CoreUObject", 
-				"Engine", 
+				"Engine",
+				"UnrealEd",
 				"InputCore",
 				"DebugLibrary", 
 				"ProceduralLevelGenerator", 
 				"InteractionSystemPlugin",
 				"UMG", 
-				"CommonUI"
+				"CommonUI", "AITestSuite"
 				// ... add other public dependencies that you statically link with here ...
 			}
 		);
