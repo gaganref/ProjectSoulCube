@@ -3,6 +3,7 @@
 
 #include "Game/DefaultGameMode.h"
 
+#include "Animation/AnimInstance.h"
 #include "Game/SCHUDGame.h"
 #include "Interface/PlayerAnimInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -95,10 +96,14 @@ void ADefaultGameMode::GameLost_Implementation()
 
 int32 ADefaultGameMode::GetTargetWeightToWin() const
 {
-	return TargetWeightToWin;
-}
-
-void ADefaultGameMode::SetTargetWeightToWin(const int32 NewWeight)
-{
-	TargetWeightToWin = NewWeight;
+	FString LevelName = UGameplayStatics::GetCurrentLevelName(this);
+	for(const auto& E : LevelWinTargetMap)
+	{
+		if(E.Key == LevelName)
+		{
+			return E.Value;
+		}
+	}
+	
+	return 25;
 }
