@@ -14,11 +14,11 @@ void UScPlayerAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribu
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 
-	if (Attribute == GetMaxHealthAttribute())
-	{
-		AdjustAttributeForMaxChange(Health, MaxHealth, NewValue, GetHealthAttribute());
-	}
-	else if (Attribute == GetMoveSpeedAttribute())
+	// if (Attribute == GetMaxHealthAttribute())
+	// {
+	// 	AdjustAttributeForMaxChange(Health, MaxHealth, NewValue, GetHealthAttribute());
+	// }
+	if (Attribute == GetMoveSpeedAttribute())
 	{
 		// Cannot slow less than 150 units/s and cannot boost more than 1000 units/s
 		NewValue = FMath::Clamp<float>(NewValue, 100, 500);
