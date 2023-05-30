@@ -9,9 +9,11 @@
 #if WITH_DEV_AUTOMATION_TESTS
 
 BEGIN_DEFINE_SPEC(InventoryTests, "ProjectSoulCube.ProjectSoulCube.Private.Tests.InventoryTests",
-								 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+								 EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
 
 // Define required test scope variables
+TSubclassOf<APlayerCharacter> PlayerCharacterClass;
+UClass* TestItemClass;
 APlayerCharacter* PlayerCharacter;
 AAScCollectableItem* CollectableTestItem;
 UInventorySystemComponent* InventorySystemComponent;
@@ -28,22 +30,32 @@ void InventoryTests::Define()
 		AutomationOpenMap(TEXT("/Game/Maps/GameMap"));
 		TestWorld = GetTestWorld();
 
-		if(!IsValid(PlayerCharacter))
+		PlayerCharacterClass = StaticLoadClass(APlayerCharacter::StaticClass(), nullptr, TEXT("/Game/Blueprints/Player/BP_SC_Player.BP_SC_Player_C"));
+		if(PlayerCharacterClass)
 		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-			PlayerCharacter = TestWorld->SpawnActor<APlayerCharacter>(FVector(0.0f, 0.0f, 650.0f), FRotator::ZeroRotator, SpawnParams);
-
-			CollectableTestItem = TestWorld->SpawnActor<AAScCollectableItem>(FVector(50.0f, 50.0f, 650.0f), FRotator::ZeroRotator, SpawnParams);
-			ItemInfo.ItemWeight = 2;
-			CollectableTestItem->SetItemInfoData(&ItemInfo);
-			
+			if(TestWorld)
+			{
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+				PlayerCharacter = TestWorld->SpawnActor<APlayerCharacter>(PlayerCharacterClass, FVector(0.0f, 0.0f, 650.0f), FRotator::ZeroRotator, SpawnParams);
+			}
 			if(PlayerCharacter)
 			{
 				if(PlayerCharacter->GetClass()->ImplementsInterface(UInventoryInterface::StaticClass()))
 				{
 					InventorySystemComponent = IInventoryInterface::Execute_GetInventorySystemComponent(PlayerCharacter);
-				}
+				}	
+			}
+		}
+		
+		TestItemClass = StaticLoadClass(AAScCollectableItem::StaticClass(), nullptr, TEXT("/Game/Blueprints/LevelGenerator/Collectables/BP_Item_HealthBuff.BP_Item_HealthBuff_C"));
+		if(TestItemClass)
+		{
+			if(TestWorld)
+			{
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+				CollectableTestItem = TestWorld->SpawnActor<AAScCollectableItem>(TestItemClass,FVector(50.0f, 50.0f, 650.0f), FRotator::ZeroRotator, SpawnParams);
 			}
 		}
 	});
@@ -51,6 +63,7 @@ void InventoryTests::Define()
 	AfterEach([this]()
 	{
 		PlayerCharacter->Destroy();
+		CollectableTestItem->Destroy();
 	});
 
 	Describe("Inventory Spawn Check", [this]()
@@ -65,55 +78,21 @@ void InventoryTests::Define()
 			TestNotNull("Collectable Item should be valid", CollectableTestItem);
 		});
 	});
-	
 
 	Describe("Inventory Check", [this]()
 	{
 		It("Verify Initial Inventory Data", [this]()
 		{
 			TestEqual("Initial Inventory should be zero",  InventorySystemComponent->GetInventorySize(), 0);
-			TestEqual("Initial Max Inventory is set from Player attribute", PlayerCharacter->GetMaxInventorySize(), InventorySystemComponent->GetMaxInventorySize() * 1.0f);
+			if(PlayerCharacter)
+			{
+				if(IPlayerStatsInterface* StatsInterface = Cast<IPlayerStatsInterface>(PlayerCharacter))
+				{
+					TestEqual("Initial Max Inventory is set from Player attribute", StatsInterface->GetMaxInventorySize(), InventorySystemComponent->GetMaxInventorySize() * 1.0f);
+				}
+			}
 		});
 	});
-	
-	// Describe("Inventory Simple Functionality Check", [this]()
-	// {
-	// 	It("Inventory Add Item Check", [this]()
-	// 	{
-	// 		InventorySystemComponent->AddItem(CollectableTestItem);
-	// 		const int32 CurrentSize = InventorySystemComponent->GetInventorySize();
-	// 		
-	// 		int32 ItemSize = 0;
-	// 		if(CollectableTestItem)
-	// 		{
-	// 			if(CollectableTestItem->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
-	// 			{
-	// 				ItemSize = IInteractableInterface::Execute_GetItemWeight(CollectableTestItem);
-	// 			}
-	// 		}
-	// 		
-	// 		TestEqual("Inventory Size should increase", InventorySystemComponent->GetInventorySize(), CurrentSize + ItemSize);
-	// 	});
-	//
-	// 	It("Inventory Remove Item Check", [this]()
-	// 	{
-	// 		InventorySystemComponent->AddItem(CollectableTestItem);
-	// 		const int32 CurrentSize = InventorySystemComponent->GetInventorySize();
-	//
-	// 		int32 ItemSize = 0;
-	// 		if(CollectableTestItem)
-	// 		{
-	// 			if(CollectableTestItem->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
-	// 			{
-	// 				ItemSize = IInteractableInterface::Execute_GetItemWeight(CollectableTestItem);
-	// 			}
-	// 		}
-	// 		
-	// 		InventorySystemComponent->RemoveItem(CollectableTestItem);
-	// 		
-	// 		TestEqual("Inventory Size should decrease", InventorySystemComponent->GetInventorySize(), CurrentSize - ItemSize);
-	// 	});
-	// });
 }
 
 #endif

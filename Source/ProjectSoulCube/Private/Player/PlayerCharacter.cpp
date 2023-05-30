@@ -67,8 +67,8 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitializeCustomCamera();
-
+	PlayerControllerRef = Cast<ACubeController>(GetController());
+	
 	if (AbilitySystemComponent)
 	{
 		// Attribute change callbacks
@@ -123,42 +123,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	}
 }
 
-void APlayerCharacter::InitializeCustomCamera()
-{
-	const TObjectPtr<UWorld> World = GetWorld();
-	check(World);
-	
-	PlayerControllerRef = Cast<ACubeController>(GetController());
-
-	if(bUseCustomFollowCamera)
-	{
-		if(!FollowCameraClass)
-		{
-			FollowCameraClass = AFollowCameraActor::StaticClass();
-		}
-		FActorSpawnParameters CameraSpawnParameters;
-		CameraSpawnParameters.Instigator = this;
-		CameraSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		FTransform SpawnTransform = GetTransform();
-		const FVector RotatedSpawnOffset = SpawnTransform.GetRotation().RotateVector(SpawnCameraOffset);
-		SpawnTransform.SetLocation(SpawnTransform.GetLocation() + RotatedSpawnOffset);
-		FollowCamera = World->SpawnActor<AFollowCameraActor>(FollowCameraClass->GetDefaultObject()->GetClass(), SpawnTransform, CameraSpawnParameters);
-		check(FollowCamera);
-
-		if(PlayerControllerRef)
-		{
-			PlayerControllerRef->SetViewTarget(FollowCamera);
-		}
-		else
-		{
-			if(bDebug)
-			{
-				DEBUG_PRINT_CUSTOM_TEXT_WITH_INFO(TEXT("PlayerControllerRef is not valid."));
-			}
-		}
-	}	
-}
-
 void APlayerCharacter::HandleInputMove_Implementation(const FInputActionValue& ActionValue)
 {
 	ICubeControllerInterface::HandleInputMove_Implementation(ActionValue);
@@ -166,10 +130,10 @@ void APlayerCharacter::HandleInputMove_Implementation(const FInputActionValue& A
 	// input is a Vector2D
 	const FVector2D MovementVector = ActionValue.Get<FVector2D>();
 
-	if (PlayerControllerRef != nullptr)
+	if (Controller != nullptr)
 	{
 		// find out which way is forward
-		const FRotator Rotation = PlayerControllerRef->GetControlRotation();
+		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 		// get forward vector
@@ -181,6 +145,12 @@ void APlayerCharacter::HandleInputMove_Implementation(const FInputActionValue& A
 		// add movement 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
+
+		// Add Camera Shake
+		if(bShouldAddCameraShake)
+		{
+			UGameplayStatics::PlayWorldCameraShake(this, CameraShakeClass, GetActorLocation(), 100.0f, 0.0f);	
+		}
 	}
 }
 
@@ -429,7 +399,7 @@ void APlayerCharacter::InitializeAttributes()
 	FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAttributes, 1/*GetCharacterLevel()*/, EffectContext);
 	if (NewHandle.IsValid())
 	{
-		FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent.Get());
+		FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*NewHandle.Data.Get());
 	}
 }
 
@@ -448,7 +418,7 @@ void APlayerCharacter::AddStartupEffects()
 		FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, 1/*GetCharacterLevel()*/, EffectContext);
 		if (NewHandle.IsValid())
 		{
-			FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent.Get());
+			FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*NewHandle.Data.Get());
 		}
 	}
 

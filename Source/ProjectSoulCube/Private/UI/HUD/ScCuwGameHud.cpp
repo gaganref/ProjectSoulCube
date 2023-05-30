@@ -6,9 +6,11 @@
 #include "Components/InventorySystemComponent.h"
 #include "Interface/InventoryInterface.h"
 #include "Interface/PlayerStatsInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/HUD/GameLooseMenu.h"
 #include "UI/HUD/GameWinMenu.h"
 #include "UI/HUD/PauseMenuWidget.h"
+#include "UI/Widgets/Buttons/ScCuwTextButton.h"
 #include "UI/Widgets/DataWidgets/AlterHelpWidget.h"
 #include "UI/Widgets/DataWidgets/ScCuwInteractableItemHelp.h"
 #include "UI/Widgets/DataWidgets/ScCuwInventoryItemStats.h"
@@ -162,8 +164,21 @@ void UScCuwGameHud::ShowWinScreen()
 	InteractableItemHelp->SetVisibility(ESlateVisibility::Collapsed);
 	PauseMenu->SetVisibility(ESlateVisibility::Collapsed);
 	LooseMenu->SetVisibility(ESlateVisibility::Collapsed);
-
+	
 	WinMenu->SetVisibility(ESlateVisibility::Visible);
+	if(UGameplayStatics::GetCurrentLevelName(this) == "Game_Level_10")
+	{
+		WinMenu->SetWinHeaderText(FText::FromString("You Won the Game, Congratulations"));
+		WinMenu->GetNextLevelButton()->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	else
+	{
+		if(WinMenu->GetNextLevelButton()->GetVisibility() == ESlateVisibility::Collapsed)
+		{
+			WinMenu->SetWinHeaderText(FText::FromString("Level Completed"));
+			WinMenu->GetNextLevelButton()->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
 }
 
 UScCuwPawnStats* UScCuwGameHud::GetPlayerStats() const

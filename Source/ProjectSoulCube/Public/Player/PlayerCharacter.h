@@ -132,6 +132,12 @@ protected:
 protected:
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	bool bShouldAddCameraShake = true;
+	
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UCameraShakeBase> CameraShakeClass;
+	
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USoundBase> ItemPickSound;
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
@@ -181,8 +187,6 @@ public:
 	virtual FPlayerShieldDamaged* GetPlayerShieldDamagedDelegate() override;
 
 protected:
-
-	virtual void InitializeCustomCamera();
 
 	virtual void InitializeAttributes();
 

@@ -56,7 +56,6 @@ void ACubeController::SetupInputComponent()
 
 	if(EnhancedInputComponent)
 	{
-		
 		if(InputActionMove && ensure(InputActionMove->ValueType == EInputActionValueType::Axis2D))
 		{
 			EnhancedInputComponent->BindAction(InputActionMove, ETriggerEvent::Triggered, this, &ACubeController::HandleMove);

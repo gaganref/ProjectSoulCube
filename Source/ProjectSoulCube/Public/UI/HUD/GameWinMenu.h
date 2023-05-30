@@ -44,6 +44,9 @@ public:
 	
 public:
 
+	UFUNCTION(BlueprintCallable)
+	void SetWinHeaderText(const FText& InText);
+	
 	UFUNCTION(BlueprintGetter)
 	class UScCuwTextButton* GetRetryButton() const;
 	

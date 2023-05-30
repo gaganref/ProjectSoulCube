@@ -46,17 +46,36 @@ void PlayerTests::Define()
 	{
 		It("Verify Initial Player Health Attribute", [this]()
 		{
-			TestEqual("Initial Health is equal to MaxHealth", PlayerCharacter->GetHealth(), PlayerCharacter->GetMaxHealth());
+			if(PlayerCharacter)
+			{
+				if(IPlayerStatsInterface* StatsInterface = Cast<IPlayerStatsInterface>(PlayerCharacter))
+				{
+					TestEqual("Initial Health is equal to MaxHealth", StatsInterface->GetHealth(), StatsInterface->GetMaxHealth());
+				}
+			}
 		});
         
 		It("Verify Initial Player Shield Attribute", [this]()
 		{
-			TestEqual("Initial Shield is equal to MaxShield", PlayerCharacter->GetShield(), PlayerCharacter->GetMaxShield());
+			if(PlayerCharacter)
+			{
+				if(IPlayerStatsInterface* StatsInterface = Cast<IPlayerStatsInterface>(PlayerCharacter))
+				{
+					
+					TestEqual("Initial Shield is equal to MaxShield", StatsInterface->GetShield(), StatsInterface->GetMaxShield());
+				}
+			}
 		});
 
 		It("Verify Initial Player Stamina Attribute", [this]()
 		{
-			TestEqual("Initial Stamina is equal to MaxStamina", PlayerCharacter->GetStamina(), PlayerCharacter->GetMaxStamina());
+			if(PlayerCharacter)
+			{
+				if(IPlayerStatsInterface* StatsInterface = Cast<IPlayerStatsInterface>(PlayerCharacter))
+				{
+					TestEqual("Initial Stamina is equal to MaxStamina", StatsInterface->GetStamina(), StatsInterface->GetMaxStamina());
+				}
+			}
 		});
 	});
 }

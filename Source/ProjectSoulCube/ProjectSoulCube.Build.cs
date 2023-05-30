@@ -14,13 +14,14 @@ public class ProjectSoulCube : ModuleRules
 				"Core", 
 				"CoreUObject", 
 				"Engine",
-				"UnrealEd",
+				//"UnrealEd",
 				"InputCore",
 				"DebugLibrary", 
 				"ProceduralLevelGenerator", 
 				"InteractionSystemPlugin",
 				"UMG", 
-				"CommonUI", "AITestSuite"
+				"CommonUI", 
+				// "AITestSuite"
 				// ... add other public dependencies that you statically link with here ...
 			}
 		);
@@ -34,7 +35,8 @@ public class ProjectSoulCube : ModuleRules
 				"GameplayTags", 
 				"GameplayTasks",
 				"Slate",
-				"SlateCore", "MoviePlayer"
+				"SlateCore", 
+				"MoviePlayer"
 				// ... add private dependencies that you statically link with here ...	
 			}
 		);
